@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人导航</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: #e8eef3;
+            min-height: 100vh;
+            padding: 15px;
+        }
+
+        .search-bar {
+            max-width: 1800px;
+            margin: 0 auto 15px;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .search-bar input {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 0.9em;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .search-bar input:focus {
+            border-color: #8b5cf6;
+        }
+
+        .search-engines {
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-engines label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.85em;
+            color: #666;
+            cursor: pointer;
+        }
+
+        .search-engines input[type="radio"] {
+            cursor: pointer;
+            accent-color: #8b5cf6;
+            width: 16px;
+            height: 16px;
+        }
+
+        /* 为不支持accent-color的浏览器提供备用样式 */
+        .search-engines input[type="radio"]:checked {
+            background-color: #8b5cf6;
+            border-color: #8b5cf6;
+        }
+
+        .search-btn {
+            padding: 12px 30px;
+            background: #8b5cf6;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .search-btn:hover {
+            background: #7c3aed;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            display: flex;
+            gap: 15px;
+        }
+
+        .sidebar {
+            width: 200px;
+            flex-shrink: 0;
+        }
+
+        .main-content {
+            flex: 1;
+        }
+
+        .section {
+            background: white;
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            font-size: 1em;
+            color: #333;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #999;
+            font-weight: 600;
+        }
+
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+        }
+
+        .sidebar .links-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .link-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 12px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #333;
+            font-size: 0.85em;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .link-item:hover {
+            background: #8b5cf6;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        }
+
+        /* 自定义tooltip样式 */
+        .tooltip {
+            position: absolute;
+            background: #8b5cf6;
+            color: white;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.8em;
+            white-space: nowrap;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+            max-width: 300px;
+            white-space: normal;
+            line-height: 1.4;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .tooltip.show {
+            opacity: 1;
+        }
+
+        .tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: #8b5cf6;
+        }
+
+        footer {
+            text-align: center;
+            color: #999;
+            margin-top: 20px;
+            font-size: 0.75em;
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+            }
+            
+            .sidebar .links-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 搜索栏 -->
+    <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="输入关键词搜索..." onkeypress="if(event.key==='Enter') performSearch()">
+        <div class="search-engines">
+            <label>
+                <input type="radio" name="engine" value="bing" checked>
+                Bing
+            </label>
+            <label>
+                <input type="radio" name="engine" value="google">
+                Google
+            </label>
+        </div>
+        <button class="search-btn" onclick="performSearch()">搜索</button>
+    </div>
+
+    <script>
+        function performSearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (!query) return;
+            
+            const engine = document.querySelector('input[name="engine"]:checked').value;
+            const urls = {
+                bing: 'https://www.bing.com/search?q=',
+                google: 'https://www.google.com/search?q='
+            };
+            
+            window.open(urls[engine] + encodeURIComponent(query), '_blank');
+        }
+
+        // 自定义tooltip功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const tooltip = document.createElement('div');
+            tooltip.className = 'tooltip';
+            document.body.appendChild(tooltip);
+            
+            let currentHoveredItem = null;
+
+            const linkItems = document.querySelectorAll('.link-item[title]');
+            
+            linkItems.forEach(item => {
+                item.addEventListener('mouseenter', function(e) {
+                    // 清除之前的状态
+                    currentHoveredItem = this;
+                    
+                    const title = this.getAttribute('title');
+                    if (title) {
+                        tooltip.textContent = title;
+                        
+                        // 移除原生title以避免冲突
+                        this.setAttribute('data-title', title);
+                        this.removeAttribute('title');
+                        
+                        // 立即计算并设置位置
+                        updateTooltipPosition(this);
+                        
+                        // 显示tooltip
+                        tooltip.classList.add('show');
+                    }
+                });
+
+                item.addEventListener('mousemove', function(e) {
+                    // 确保只处理当前hover的元素
+                    if (currentHoveredItem === this && tooltip.classList.contains('show')) {
+                        updateTooltipPosition(this);
+                    }
+                });
+
+                item.addEventListener('mouseleave', function() {
+                    // 只有当前元素离开时才隐藏tooltip
+                    if (currentHoveredItem === this) {
+                        tooltip.classList.remove('show');
+                        currentHoveredItem = null;
+                        
+                        // 恢复title属性
+                        const dataTitle = this.getAttribute('data-title');
+                        if (dataTitle) {
+                            this.setAttribute('title', dataTitle);
+                        }
+                    }
+                });
+            });
+            
+            function updateTooltipPosition(element) {
+                // 强制重新计算布局
+                tooltip.style.visibility = 'hidden';
+                tooltip.style.display = 'block';
+                
+                const rect = tooltip.getBoundingClientRect();
+                const buttonRect = element.getBoundingClientRect();
+                
+                // 计算水平居中位置
+                let left = buttonRect.left + (buttonRect.width / 2) - (rect.width / 2);
+                let top = buttonRect.top - rect.height - 20; // 显示在按钮上方20px处
+                
+                // 如果上方空间不够，显示在按钮下方
+                if (top < 10) {
+                    top = buttonRect.bottom + 20; // 显示在按钮下方20px处
+                }
+                
+                // 防止tooltip超出屏幕左右边界
+                if (left < 10) left = 10;
+                if (left + rect.width > window.innerWidth - 10) {
+                    left = window.innerWidth - rect.width - 10;
+                }
+                
+                // 防止tooltip超出屏幕下边界
+                if (top + rect.height > window.innerHeight - 10) {
+                    top = buttonRect.top - rect.height - 20; // 强制显示在按钮上方20px
+                }
+                
+                // 应用位置
+                tooltip.style.left = left + 'px';
+                tooltip.style.top = top + 'px';
+                tooltip.style.visibility = 'visible';
+            }
+        });
+    </script>
+
+    <div class="container">
+        <!-- 左侧边栏 -->
+        <div class="sidebar">
+            <!-- 搜索引擎 -->
+            <div class="section">
+                <div class="section-title">🔍 搜索引擎</div>
+                <div class="links-grid">
+                    <a href="https://www.google.com/" class="link-item" target="_blank" title="全球最大的搜索引擎，提供网页、图片、视频等搜索服务">Google</a>
+                    <a href="https://www.bing.com/" class="link-item" target="_blank" title="微软推出的搜索引擎，提供网页搜索和每日精美壁纸">必应</a>
+                    <a href="https://www.baidu.com/" class="link-item" target="_blank" title="中国最大的搜索引擎，提供中文网页、图片、视频搜索">百度</a>
+                    <a href="https://ditu.amap.com/" class="link-item" target="_blank" title="高德地图，提供精准的地图导航和位置服务">高德地图</a>
+                    <a href="https://maps.google.com/" class="link-item" target="_blank" title="谷歌地图，全球地图服务和导航工具">谷歌地图</a>
+                    <a href="https://earth.google.com/" class="link-item" target="_blank" title="谷歌地球，探索世界各地的卫星图像和3D地形">谷歌地球</a>
+                </div>
+            </div>
+
+            <!-- 办公工具 -->
+            <div class="section">
+                <div class="section-title">📧 办公工具</div>
+                <div class="links-grid">
+                    <a href="https://mail.qq.com/" class="link-item" target="_blank" title="腾讯QQ邮箱，提供免费邮件收发服务">QQ邮箱</a>
+                    <a href="https://mail.163.com/" class="link-item" target="_blank" title="网易163邮箱，老牌免费邮箱服务">163邮箱</a>
+                    <a href="https://mail.google.com/" class="link-item" target="_blank" title="Google Gmail，功能强大的免费邮箱服务">Gmail</a>
+                    <a href="https://www.feishu.cn/" class="link-item" target="_blank" title="飞书，字节跳动推出的协作办公平台">飞书</a>
+                    <a href="https://docs.qq.com/" class="link-item" target="_blank" title="腾讯文档，在线文档编辑和协作平台">腾讯文档</a>
+                    <a href="https://pan.baidu.com/" class="link-item" target="_blank" title="百度网盘，提供大容量云存储和文件同步">百度网盘</a>
+                    <a href="https://www.aliyundrive.com/" class="link-item" target="_blank" title="阿里云盘，阿里巴巴推出的云存储服务">阿里云盘</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧主内容区 -->
+        <div class="main-content">
+        <!-- 社交媒体 -->
+        <div class="section">
+            <div class="section-title">💬 社交媒体</div>
+            <div class="links-grid">
+                <a href="https://wx.qq.com/" class="link-item" target="_blank" title="微信网页版，随时随地收发消息">微信</a>
+                <a href="https://weibo.com/" class="link-item" target="_blank" title="新浪微博，中国最大的社交媒体平台">微博</a>
+                <a href="https://www.zhihu.com/" class="link-item" target="_blank" title="知乎，中文互联网高质量的问答社区">知乎</a>
+                <a href="https://www.douban.com/" class="link-item" target="_blank" title="豆瓣，文艺青年聚集的书影音评分平台">豆瓣</a>
+                <a href="https://www.xiaohongshu.com/" class="link-item" target="_blank" title="小红书，年轻人的生活方式平台和消费决策入口">小红书</a>
+            </div>
+        </div>
+
+        <!-- AI 工具 -->
+        <div class="section">
+            <div class="section-title">🤖 AI 工具</div>
+            <div class="links-grid">
+                <a href="https://chatgpt.com/" class="link-item" target="_blank" title="OpenAI开发的AI聊天机器人，功能强大的对话AI">ChatGPT</a>
+                <a href="https://gemini.google.com/" class="link-item" target="_blank" title="Google推出的多模态AI助手，支持文本、图像和代码">Gemini</a>
+                <a href="https://notebooklm.google/" class="link-item" target="_blank" title="Google推出的AI笔记本，智能整理和分析文档内容">NotebookLM</a>
+                <a href="https://aistudio.google.com/" class="link-item" target="_blank" title="Google AI开发平台，构建和部署AI应用的工具">Google AI Studio</a>
+                <a href="https://labs.google/fx/tools/flow" class="link-item" target="_blank" title="Google实验室的Flow工具，AI驱动的创意工作流">Google Flow</a>
+                <a href="https://copilot.microsoft.com/" class="link-item" target="_blank" title="微软AI助手，集成在Office和Windows中的智能助手">Copilot</a>
+                <a href="https://www.doubao.com/" class="link-item" target="_blank" title="字节跳动推出的AI聊天助手，支持多种对话场景">豆包</a>
+                <a href="https://klingai.kuaishou.com/" class="link-item" target="_blank" title="快手推出的AI视频生成工具，轻松创作短视频内容">可灵AI</a>
+                <a href="https://jimeng.jianying.com/" class="link-item" target="_blank" title="剪映推出的AI创意工具，智能生成视频和图像">即梦AI</a>
+                <a href="https://tongyi.aliyun.com/" class="link-item" target="_blank" title="阿里云推出的大语言模型，提供智能对话服务">通义千问</a>
+                <a href="https://ima.qq.com/" class="link-item" target="_blank" title="腾讯IMA会思考的知识库，智能整理和分析知识内容">腾讯IMA</a>
+                <a href="https://arc.tencent.com/zh/ai-demos/faceRestoration" class="link-item" target="_blank" title="腾讯ARC实验室的人脸修复技术，AI增强图像质量">腾讯ARC</a>
+                <a href="https://kimi.moonshot.cn/" class="link-item" target="_blank" title="月之暗面推出的AI助手，擅长长文本理解和分析">Kimi</a>
+                <a href="https://www.deepseek.com/" class="link-item" target="_blank" title="DeepSeek AI，专注于深度学习和推理的AI助手">DeepSeek</a>
+                <a href="https://www.getget.cc/" class="link-item" target="_blank" title="AI驱动的智能笔记工具，帮助整理和管理知识">Get笔记</a>
+                <a href="https://suno.com/" class="link-item" target="_blank" title="AI音乐生成平台，通过文本描述创作原创音乐">Suno</a>
+                <a href="https://elevenlabs.io/" class="link-item" target="_blank" title="ElevenLabs AI语音合成平台，生成逼真的人工智能语音">ElevenLabs</a>
+                <a href="https://www.yourmusic.fun/" class="link-item" target="_blank" title="AI音乐创作平台，让每个人都能创作属于自己的音乐">YourMusic</a>
+            </div>
+        </div>
+
+        <!-- 开发工具 -->
+        <div class="section">
+            <div class="section-title">🛠️ 开发工具</div>
+            <div class="links-grid">
+                <a href="https://github.com/" class="link-item" target="_blank" title="全球最大的代码托管平台，开源项目的聚集地">GitHub</a>
+                <a href="https://gitee.com/" class="link-item" target="_blank" title="国内领先的代码托管平台，支持Git和SVN">Gitee</a>
+                <a href="https://app.diagrams.net/" class="link-item" target="_blank" title="免费的在线流程图和图表绘制工具">Draw.io</a>
+                <a href="https://excalidraw.com/" class="link-item" target="_blank" title="简洁的手绘风格图表和白板工具">Excalidraw</a>
+                <a href="https://www.figma.com/" class="link-item" target="_blank" title="专业的UI/UX设计工具，支持团队协作">Figma</a>
+                <a href="https://www.canva.com/" class="link-item" target="_blank" title="简单易用的图形设计平台，丰富的模板库">Canva</a>
+                <a href="https://app.standardnotes.com/" class="link-item" target="_blank" title="Standard Notes，注重隐私和安全的开源笔记应用">Standard Notes</a>
+                <a href="https://www.yinxiang.com/" class="link-item" target="_blank" title="印象笔记，专业的笔记和知识管理工具">印象笔记</a>
+                <a href="https://www.geogebra.org/" class="link-item" target="_blank" title="GeoGebra，免费的数学软件，支持几何、代数、统计和微积分">GeoGebra</a>
+            </div>
+        </div>
+
+        <!-- 生活服务 -->
+        <div class="section">
+            <div class="section-title">🏠 生活服务</div>
+            <div class="links-grid">
+                <a href="https://www.taobao.com/" class="link-item" target="_blank" title="阿里巴巴旗下购物网站，万能的网购平台">淘宝</a>
+                <a href="https://www.jd.com/" class="link-item" target="_blank" title="京东商城，品质保证的综合电商平台">京东</a>
+                <a href="https://www.12306.cn/" class="link-item" target="_blank" title="中国铁路客户服务中心，火车票预订官网">12306</a>
+                <a href="https://www.ctrip.com/" class="link-item" target="_blank" title="携程旅行网，一站式旅游服务平台">携程</a>
+                <a href="https://www.qunar.com/" class="link-item" target="_blank" title="去哪儿网，旅游产品搜索和比价平台">去哪儿</a>
+                <a href="https://www.fliggy.com/" class="link-item" target="_blank" title="阿里旅行·飞猪，年轻人的旅行平台">飞猪</a>
+                <a href="https://www.alipay.com/" class="link-item" target="_blank" title="支付宝，数字生活开放平台">支付宝</a>
+                <a href="https://www.meituan.com/" class="link-item" target="_blank" title="美团，生活服务电商平台">美团</a>
+                <a href="https://www.dianping.com/" class="link-item" target="_blank" title="大众点评，本地生活信息及交易平台">大众点评</a>
+            </div>
+        </div>
+
+        <!-- 娱乐影音 -->
+        <div class="section">
+            <div class="section-title">🎬 娱乐影音</div>
+            <div class="links-grid">
+                <a href="https://www.bilibili.com/" class="link-item" target="_blank" title="哔哩哔哩，年轻人聚集的弹幕视频网站">哔哩哔哩</a>
+                <a href="https://www.youtube.com/" class="link-item" target="_blank" title="YouTube，全球最大的视频分享平台">YouTube</a>
+                <a href="https://www.douyin.com/" class="link-item" target="_blank" title="抖音，记录美好生活的短视频平台">抖音</a>
+                <a href="https://www.youku.com/" class="link-item" target="_blank" title="优酷视频，这世界很酷的视频平台">优酷</a>
+                <a href="https://www.iqiyi.com/" class="link-item" target="_blank" title="爱奇艺，悦享品质的视频娱乐平台">爱奇艺</a>
+                <a href="https://v.qq.com/" class="link-item" target="_blank" title="腾讯视频，不负好时光的视频平台">腾讯视频</a>
+                <a href="https://music.163.com/" class="link-item" target="_blank" title="网易云音乐，音乐的力量的音乐平台">网易云音乐</a>
+                <a href="https://y.qq.com/" class="link-item" target="_blank" title="QQ音乐，听我想听的音乐平台">QQ音乐</a>
+                <a href="https://www.kugou.com/" class="link-item" target="_blank" title="酷狗音乐，就是歌多的数字音乐平台">酷狗音乐</a>
+            </div>
+        </div>
+
+        </div>
+    </div>
+
+    <footer>
+        <p>个人导航</p>
+    </footer>
+</body>
+</html>
