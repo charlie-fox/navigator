@@ -13,18 +13,37 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
-            background: #e8eef3;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background-attachment: fixed;
             min-height: 100vh;
             padding: 15px;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
         }
 
         .search-bar {
             max-width: 1800px;
             margin: 0 auto 15px;
-            background: white;
-            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
             padding: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             display: flex;
             align-items: center;
             gap: 15px;
@@ -33,15 +52,18 @@
         .search-bar input {
             flex: 1;
             padding: 12px 20px;
-            border: 2px solid #e0e0e0;
+            border: 2px solid rgba(139, 92, 246, 0.2);
             border-radius: 25px;
             font-size: 0.9em;
             outline: none;
-            transition: border-color 0.3s;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
         }
 
         .search-bar input:focus {
             border-color: #8b5cf6;
+            background: rgba(255, 255, 255, 1);
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
         }
 
         .search-engines {
@@ -73,17 +95,19 @@
 
         .search-btn {
             padding: 12px 30px;
-            background: #8b5cf6;
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
             color: white;
             border: none;
             border-radius: 25px;
             font-size: 0.9em;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
         }
 
         .search-btn:hover {
-            background: #7c3aed;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
         }
 
         .container {
@@ -103,21 +127,57 @@
         }
 
         .section {
-            background: white;
-            border-radius: 10px;
-            padding: 18px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--section-color, #8b5cf6);
+            border-radius: 0 2px 2px 0;
         }
 
         .section-title {
-            font-size: 1em;
-            color: #333;
-            margin-bottom: 12px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #999;
+            font-size: 1.1em;
+            color: #2d3748;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.1);
             font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
+
+        /* 为不同分类设置主题色 - 日式柔和配色 */
+        .section:nth-child(1) { --section-color: #7b9cb0; } /* 搜索引擎 - 雾霾蓝 */
+        .section:nth-child(2) { --section-color: #8faa96; } /* 办公工具 - 抹茶绿 */
+        .section:nth-child(1) .section-title { color: #7b9cb0; }
+        .section:nth-child(2) .section-title { color: #8faa96; }
+
+        .main-content .section:nth-child(1) { --section-color: #c4a484; } /* 社交媒体 - 暖米色 */
+        .main-content .section:nth-child(2) { --section-color: #a394c4; } /* AI工具 - 薰衣草紫 */
+        .main-content .section:nth-child(3) { --section-color: #84a4c4; } /* 开发工具 - 灰蓝色 */
+        .main-content .section:nth-child(4) { --section-color: #c49494; } /* 生活服务 - 樱花粉 */
+        .main-content .section:nth-child(5) { --section-color: #b4a4c4; } /* 娱乐影音 - 淡紫灰 */
+
+        .main-content .section:nth-child(1) .section-title { color: #c4a484; }
+        .main-content .section:nth-child(2) .section-title { color: #a394c4; }
+        .main-content .section:nth-child(3) .section-title { color: #84a4c4; }
+        .main-content .section:nth-child(4) .section-title { color: #c49494; }
+        .main-content .section:nth-child(5) .section-title { color: #b4a4c4; }
 
         .links-grid {
             display: grid;
@@ -133,41 +193,64 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 10px 12px;
-            background: #f8f9fa;
-            border-radius: 6px;
+            padding: 12px 16px;
+            background: rgba(248, 250, 252, 0.8);
+            border-radius: 10px;
             text-decoration: none;
-            color: #333;
+            color: #374151;
             font-size: 0.85em;
+            font-weight: 500;
             transition: all 0.3s ease;
-            border: 2px solid transparent;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+            line-height: 1.3;
+            min-height: 44px;
+        }
+
+        .link-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .link-item:hover::before {
+            left: 100%;
         }
 
         .link-item:hover {
-            background: #8b5cf6;
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+            background: rgba(255, 255, 255, 0.95);
+            color: var(--section-color, #8b5cf6);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: var(--section-color, #8b5cf6);
         }
 
         /* 自定义tooltip样式 */
         .tooltip {
             position: absolute;
-            background: #8b5cf6;
+            background: rgba(45, 55, 72, 0.95);
+            backdrop-filter: blur(10px);
             color: white;
-            padding: 10px 14px;
-            border-radius: 8px;
+            padding: 12px 16px;
+            border-radius: 10px;
             font-size: 0.8em;
             white-space: nowrap;
             z-index: 1000;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.3s ease;
-            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             max-width: 300px;
             white-space: normal;
-            line-height: 1.4;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            line-height: 1.5;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .tooltip.show {
@@ -180,15 +263,20 @@
             top: 100%;
             left: 50%;
             transform: translateX(-50%);
-            border: 6px solid transparent;
-            border-top-color: #8b5cf6;
+            border: 8px solid transparent;
+            border-top-color: rgba(45, 55, 72, 0.95);
         }
 
         footer {
             text-align: center;
-            color: #999;
-            margin-top: 20px;
-            font-size: 0.75em;
+            color: rgba(107, 114, 128, 0.8);
+            margin-top: 30px;
+            font-size: 0.8em;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         @media (max-width: 1024px) {
@@ -329,9 +417,9 @@
     <div class="container">
         <!-- 左侧边栏 -->
         <div class="sidebar">
-            <!-- 搜索引擎 -->
+            <!-- 搜索 -->
             <div class="section">
-                <div class="section-title">🔍 搜索引擎</div>
+                <div class="section-title">🔍 搜索</div>
                 <div class="links-grid">
                     <a href="https://www.google.com/" class="link-item" target="_blank" title="全球最大的搜索引擎，提供网页、图片、视频等搜索服务">Google</a>
                     <a href="https://www.bing.com/" class="link-item" target="_blank" title="微软推出的搜索引擎，提供网页搜索和每日精美壁纸">必应</a>
@@ -342,9 +430,9 @@
                 </div>
             </div>
 
-            <!-- 办公工具 -->
+            <!-- 办公 -->
             <div class="section">
-                <div class="section-title">📧 办公工具</div>
+                <div class="section-title">📧 办公</div>
                 <div class="links-grid">
                     <a href="https://mail.qq.com/" class="link-item" target="_blank" title="腾讯QQ邮箱，提供免费邮件收发服务">QQ邮箱</a>
                     <a href="https://mail.163.com/" class="link-item" target="_blank" title="网易163邮箱，老牌免费邮箱服务">163邮箱</a>
@@ -359,9 +447,9 @@
 
         <!-- 右侧主内容区 -->
         <div class="main-content">
-        <!-- 社交媒体 -->
+        <!-- 社交 -->
         <div class="section">
-            <div class="section-title">💬 社交媒体</div>
+            <div class="section-title">💬 社交</div>
             <div class="links-grid">
                 <a href="https://wx.qq.com/" class="link-item" target="_blank" title="微信网页版，随时随地收发消息">微信</a>
                 <a href="https://weibo.com/" class="link-item" target="_blank" title="新浪微博，中国最大的社交媒体平台">微博</a>
@@ -371,9 +459,9 @@
             </div>
         </div>
 
-        <!-- AI 工具 -->
+        <!-- AI -->
         <div class="section">
-            <div class="section-title">🤖 AI 工具</div>
+            <div class="section-title">🤖 AI</div>
             <div class="links-grid">
                 <a href="https://chatgpt.com/" class="link-item" target="_blank" title="OpenAI开发的AI聊天机器人，功能强大的对话AI">ChatGPT</a>
                 <a href="https://gemini.google.com/" class="link-item" target="_blank" title="Google推出的多模态AI助手，支持文本、图像和代码">Gemini</a>
@@ -396,9 +484,9 @@
             </div>
         </div>
 
-        <!-- 开发工具 -->
+        <!-- 开发 -->
         <div class="section">
-            <div class="section-title">🛠️ 开发工具</div>
+            <div class="section-title">🛠️ 开发</div>
             <div class="links-grid">
                 <a href="https://github.com/" class="link-item" target="_blank" title="全球最大的代码托管平台，开源项目的聚集地">GitHub</a>
                 <a href="https://gitee.com/" class="link-item" target="_blank" title="国内领先的代码托管平台，支持Git和SVN">Gitee</a>
@@ -412,9 +500,9 @@
             </div>
         </div>
 
-        <!-- 生活服务 -->
+        <!-- 生活 -->
         <div class="section">
-            <div class="section-title">🏠 生活服务</div>
+            <div class="section-title">🏠 生活</div>
             <div class="links-grid">
                 <a href="https://www.taobao.com/" class="link-item" target="_blank" title="阿里巴巴旗下购物网站，万能的网购平台">淘宝</a>
                 <a href="https://www.jd.com/" class="link-item" target="_blank" title="京东商城，品质保证的综合电商平台">京东</a>
@@ -428,9 +516,9 @@
             </div>
         </div>
 
-        <!-- 娱乐影音 -->
+        <!-- 娱乐 -->
         <div class="section">
-            <div class="section-title">🎬 娱乐影音</div>
+            <div class="section-title">🎬 娱乐</div>
             <div class="links-grid">
                 <a href="https://www.bilibili.com/" class="link-item" target="_blank" title="哔哩哔哩，年轻人聚集的弹幕视频网站">哔哩哔哩</a>
                 <a href="https://www.youtube.com/" class="link-item" target="_blank" title="YouTube，全球最大的视频分享平台">YouTube</a>
