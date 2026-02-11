@@ -1,647 +1,1120 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="个人网站导航，集成搜索、社交、AI工具、开发工具等常用网站链接">
-    <meta name="theme-color" content="#8b5cf6">
-    <title>个人导航</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: system-ui, -apple-system, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-            font-display: swap;
-            background: linear-gradient(135deg, #4a5568 0%, #5a6c7d 50%, #4a5568 100%);
-            background-attachment: fixed;
-            min-height: 100vh;
-            padding: 15px;
-            position: relative;
-            color: #2d3748;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(ellipse at center, rgba(52, 73, 94, 0.1) 0%, rgba(44, 62, 80, 0.05) 100%);
-            pointer-events: none;
-            z-index: -1;
-        }
-
-        .search-bar {
-            max-width: 1800px;
-            margin: 0 auto 15px;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            backdrop-filter: blur(10px);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .search-bar input {
-            flex: 1;
-            padding: 12px 20px;
-            border: 2px solid rgba(139, 92, 246, 0.2);
-            border-radius: 25px;
-            font-size: 0.9em;
-            outline: none;
-            transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.9);
-            color: #2d3748;
-        }
-
-        .search-bar input:focus {
-            border-color: #8b5cf6;
-            background: rgba(255, 255, 255, 1);
-            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
-        }
-
-        .search-bar input::placeholder {
-            color: #a0aec0;
-        }
-
-        .search-engines {
-            display: flex;
-            gap: 10px;
-        }
-
-        .search-engines label {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 0.85em;
-            color: #4a5568;
-            cursor: pointer;
-        }
-
-        .search-engines input[type="radio"] {
-            cursor: pointer;
-            accent-color: #8b5cf6;
-            width: 16px;
-            height: 16px;
-        }
-
-        /* 为不支持accent-color的浏览器提供备用样式 */
-        .search-engines input[type="radio"]:checked {
-            background-color: #8b5cf6;
-            border-color: #8b5cf6;
-        }
-
-        .search-btn {
-            padding: 12px 30px;
-            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-            color: white;
-            border: none;
-            border-radius: 25px;
-            font-size: 0.9em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
-        }
-
-        .search-btn:hover {
-            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
-            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
-        }
-
-        .container {
-            max-width: 1800px;
-            margin: 0 auto;
-            display: flex;
-            gap: 15px;
-        }
-
-        .sidebar {
-            width: 200px;
-            flex-shrink: 0;
-        }
-
-        .main-content {
-            flex: 1;
-        }
-
-        .section {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            backdrop-filter: blur(10px);
-            position: relative;
-            overflow: hidden;
-        }
-
-
-        .section-title {
-            font-size: 1.1em;
-            color: #2d3748;
-            margin-bottom: 16px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid rgba(0, 0, 0, 0.1);
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* 简洁的标题颜色方案 */
-        .sidebar .section:nth-child(1) { --section-color: #1e40af; }
-        .sidebar .section:nth-child(1) .section-title { color: #1e40af; } /* 搜索 - 深蓝 */
-
-        .sidebar .section:nth-child(2) { --section-color: #047857; }
-        .sidebar .section:nth-child(2) .section-title { color: #047857; } /* 办公 - 深绿 */
-
-        .main-content .section:nth-child(1) { --section-color: #b45309; }
-        .main-content .section:nth-child(1) .section-title { color: #b45309; } /* 社交 - 深橙 */
-
-        .main-content .section:nth-child(2) { --section-color: #6d28d9; }
-        .main-content .section:nth-child(2) .section-title { color: #6d28d9; } /* AI - 深紫 */
-
-        .main-content .section:nth-child(3) { --section-color: #4338ca; }
-        .main-content .section:nth-child(3) .section-title { color: #4338ca; } /* 工具 - 深蓝紫 */
-
-        .main-content .section:nth-child(4) { --section-color: #be185d; }
-        .main-content .section:nth-child(4) .section-title { color: #be185d; } /* 生活 - 深粉 */
-
-        .main-content .section:nth-child(5) { --section-color: #dc2626; }
-        .main-content .section:nth-child(5) .section-title { color: #dc2626; } /* 娱乐 - 深红 */
-
-        .links-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 10px;
-        }
-
-        .sidebar .links-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .link-item {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 12px 16px;
-            background: rgba(248, 250, 252, 0.9);
-            border-radius: 10px;
-            text-decoration: none;
-            color: #374151;
-            font-size: 0.85em;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(0, 0, 0, 0.15);
-            position: relative;
-            overflow: hidden;
-            text-align: center;
-            line-height: 1.3;
-            min-height: 44px;
-        }
-
-        .link-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .link-item:hover::before {
-            left: 100%;
-        }
-
-        .link-item:hover {
-            background: rgba(255, 255, 255, 0.95);
-            color: var(--section-color, #8b5cf6);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-            border-color: var(--section-color, #8b5cf6);
-        }
-
-        /* 自定义tooltip样式 */
-        .tooltip {
-            position: fixed;
-            background: rgba(45, 55, 72, 0.95);
-            color: white;
-            padding: 12px 16px;
-            border-radius: 10px;
-            font-size: 0.8em;
-            white-space: nowrap;
-            z-index: 1000;
-            opacity: 0;
-            pointer-events: none;
-            display: none;
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
-            max-width: 300px;
-            white-space: normal;
-            line-height: 1.5;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .tooltip.show {
-            display: block !important;
-            opacity: 1 !important;
-        }
-
-        .tooltip::after {
-            content: '';
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            border: 8px solid transparent;
-            border-top-color: rgba(45, 55, 72, 0.95);
-        }
-
-
-        /* 低配置设备优化 */
-        @media (prefers-reduced-motion: reduce) {
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta
+            name="description"
+            content="个人网站导航，集成搜索、社交、AI工具、开发工具等常用网站链接"
+        />
+        <meta name="theme-color" content="#8b5cf6" />
+        <title>个人导航</title>
+        <style>
             * {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
             }
 
-            .link-item::before {
-                display: none;
+            body {
+                font-family:
+                    system-ui,
+                    -apple-system,
+                    "Segoe UI",
+                    "PingFang SC",
+                    "Microsoft YaHei",
+                    sans-serif;
+                font-display: swap;
+                background: linear-gradient(
+                    135deg,
+                    #4a5568 0%,
+                    #5a6c7d 50%,
+                    #4a5568 100%
+                );
+                background-attachment: fixed;
+                min-height: 100vh;
+                padding: 15px;
+                position: relative;
+                color: #2d3748;
             }
 
-            .link-item:hover {
-                transform: none;
+            body::before {
+                content: "";
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: radial-gradient(
+                    ellipse at center,
+                    rgba(52, 73, 94, 0.1) 0%,
+                    rgba(44, 62, 80, 0.05) 100%
+                );
+                pointer-events: none;
+                z-index: -1;
             }
-        }
 
-        /* 低分辨率设备优化 */
-        @media (max-resolution: 150dpi) {
-            .search-bar,
-            .section {
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            .search-bar {
+                max-width: 1800px;
+                margin: 0 auto 15px;
+                background: rgba(255, 255, 255, 0.95);
+                border-radius: 16px;
+                padding: 20px;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                backdrop-filter: blur(10px);
+                display: flex;
+                align-items: center;
+                gap: 15px;
             }
 
-            .link-item {
-                box-shadow: none;
-                border: 1px solid #d1d5db;
+            .search-bar input {
+                flex: 1;
+                padding: 12px 20px;
+                border: 2px solid rgba(139, 92, 246, 0.2);
+                border-radius: 25px;
+                font-size: 0.9em;
+                outline: none;
+                transition: all 0.3s ease;
+                background: rgba(255, 255, 255, 0.9);
+                color: #2d3748;
             }
-        }
 
-        @media (max-width: 1024px) {
+            .search-bar input:focus {
+                border-color: #8b5cf6;
+                background: rgba(255, 255, 255, 1);
+                box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+            }
+
+            .search-bar input::placeholder {
+                color: #a0aec0;
+            }
+
+            .search-engines {
+                display: flex;
+                gap: 10px;
+            }
+
+            .search-engines label {
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                font-size: 0.85em;
+                color: #4a5568;
+                cursor: pointer;
+            }
+
+            .search-engines input[type="radio"] {
+                cursor: pointer;
+                accent-color: #8b5cf6;
+                width: 16px;
+                height: 16px;
+            }
+
+            /* 为不支持accent-color的浏览器提供备用样式 */
+            .search-engines input[type="radio"]:checked {
+                background-color: #8b5cf6;
+                border-color: #8b5cf6;
+            }
+
+            .search-btn {
+                padding: 12px 30px;
+                background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+                color: white;
+                border: none;
+                border-radius: 25px;
+                font-size: 0.9em;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+            }
+
+            .search-btn:hover {
+                background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+                box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+            }
+
             .container {
-                flex-direction: column;
+                max-width: 1800px;
+                margin: 0 auto;
+                display: flex;
+                gap: 15px;
             }
 
             .sidebar {
-                width: 100%;
+                width: 200px;
+                flex-shrink: 0;
+            }
+
+            .main-content {
+                flex: 1;
+            }
+
+            .section {
+                background: rgba(255, 255, 255, 0.95);
+                border-radius: 16px;
+                padding: 20px;
+                margin-bottom: 20px;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                backdrop-filter: blur(10px);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .section-title {
+                font-size: 1.1em;
+                color: #2d3748;
+                margin-bottom: 16px;
+                padding-bottom: 10px;
+                border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            /* 简洁的标题颜色方案 */
+            .sidebar .section:nth-child(1) {
+                --section-color: #1e40af;
+            }
+            .sidebar .section:nth-child(1) .section-title {
+                color: #1e40af;
+            } /* 搜索 - 深蓝 */
+
+            .sidebar .section:nth-child(2) {
+                --section-color: #047857;
+            }
+            .sidebar .section:nth-child(2) .section-title {
+                color: #047857;
+            } /* 办公 - 深绿 */
+
+            .main-content .section:nth-child(1) {
+                --section-color: #b45309;
+            }
+            .main-content .section:nth-child(1) .section-title {
+                color: #b45309;
+            } /* 社交 - 深橙 */
+
+            .main-content .section:nth-child(2) {
+                --section-color: #6d28d9;
+            }
+            .main-content .section:nth-child(2) .section-title {
+                color: #6d28d9;
+            } /* AI - 深紫 */
+
+            .main-content .section:nth-child(3) {
+                --section-color: #4338ca;
+            }
+            .main-content .section:nth-child(3) .section-title {
+                color: #4338ca;
+            } /* 工具 - 深蓝紫 */
+
+            .main-content .section:nth-child(4) {
+                --section-color: #be185d;
+            }
+            .main-content .section:nth-child(4) .section-title {
+                color: #be185d;
+            } /* 生活 - 深粉 */
+
+            .main-content .section:nth-child(5) {
+                --section-color: #dc2626;
+            }
+            .main-content .section:nth-child(5) .section-title {
+                color: #dc2626;
+            } /* 娱乐 - 深红 */
+
+            .links-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 10px;
             }
 
             .sidebar .links-grid {
-                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+                grid-template-columns: 1fr;
             }
 
-            /* 移动端进一步简化效果 */
-            .search-bar,
-            .section,
-            .tooltip {
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            }
-        }
-
-        /* 超低配置设备 - 完全禁用装饰效果 */
-        @media (max-width: 480px), (pointer: coarse) and (max-device-width: 768px) {
-            body::before {
-                display: none;
-            }
-
-            .link-item::before,
-            .tooltip::after {
-                display: none;
-            }
-
-            .search-bar,
-            .section,
             .link-item {
-                box-shadow: none;
-                border: 1px solid #9ca3af;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 12px 16px;
+                background: rgba(248, 250, 252, 0.9);
+                border-radius: 10px;
+                text-decoration: none;
+                color: #374151;
+                font-size: 0.85em;
+                font-weight: 500;
+                transition: all 0.3s ease;
+                border: 1px solid rgba(0, 0, 0, 0.15);
+                position: relative;
+                overflow: hidden;
+                text-align: center;
+                line-height: 1.3;
+                min-height: 44px;
             }
-        }
-    </style>
-</head>
-<body>
-    <!-- 搜索栏 -->
-    <div class="search-bar">
-        <input type="text" id="searchInput" placeholder="输入关键词搜索...">
-        <div class="search-engines">
-            <label>
-                <input type="radio" name="engine" value="bing" checked>
-                Bing
-            </label>
-            <label>
-                <input type="radio" name="engine" value="google">
-                Google
-            </label>
+
+            .link-item::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.4),
+                    transparent
+                );
+                transition: left 0.5s ease;
+            }
+
+            .link-item:hover::before {
+                left: 100%;
+            }
+
+            .link-item:hover {
+                background: rgba(255, 255, 255, 0.95);
+                color: var(--section-color, #8b5cf6);
+                transform: translateY(-1px);
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+                border-color: var(--section-color, #8b5cf6);
+            }
+
+            /* 自定义tooltip样式 */
+            .tooltip {
+                position: fixed;
+                background: rgba(45, 55, 72, 0.95);
+                color: white;
+                padding: 12px 16px;
+                border-radius: 10px;
+                font-size: 0.8em;
+                white-space: nowrap;
+                z-index: 1000;
+                opacity: 0;
+                pointer-events: none;
+                display: none;
+                box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+                max-width: 300px;
+                white-space: normal;
+                line-height: 1.5;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .tooltip.show {
+                display: block !important;
+                opacity: 1 !important;
+            }
+
+            .tooltip::after {
+                content: "";
+                position: absolute;
+                top: 100%;
+                left: 50%;
+                transform: translateX(-50%);
+                border: 8px solid transparent;
+                border-top-color: rgba(45, 55, 72, 0.95);
+            }
+
+            /* 低配置设备优化 */
+            @media (prefers-reduced-motion: reduce) {
+                * {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+
+                .link-item::before {
+                    display: none;
+                }
+
+                .link-item:hover {
+                    transform: none;
+                }
+            }
+
+            /* 低分辨率设备优化 */
+            @media (max-resolution: 150dpi) {
+                .search-bar,
+                .section {
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                }
+
+                .link-item {
+                    box-shadow: none;
+                    border: 1px solid #d1d5db;
+                }
+            }
+
+            @media (max-width: 1024px) {
+                .container {
+                    flex-direction: column;
+                }
+
+                .sidebar {
+                    width: 100%;
+                }
+
+                .sidebar .links-grid {
+                    grid-template-columns: repeat(
+                        auto-fill,
+                        minmax(100px, 1fr)
+                    );
+                }
+
+                /* 移动端进一步简化效果 */
+                .search-bar,
+                .section,
+                .tooltip {
+                    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+                }
+            }
+
+            /* 超低配置设备 - 完全禁用装饰效果 */
+            @media (max-width: 480px),
+                (pointer: coarse) and (max-device-width: 768px) {
+                body::before {
+                    display: none;
+                }
+
+                .link-item::before,
+                .tooltip::after {
+                    display: none;
+                }
+
+                .search-bar,
+                .section,
+                .link-item {
+                    box-shadow: none;
+                    border: 1px solid #9ca3af;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <!-- 搜索栏 -->
+        <div class="search-bar">
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="输入关键词搜索..."
+            />
+            <div class="search-engines">
+                <label>
+                    <input type="radio" name="engine" value="bing" checked />
+                    Bing
+                </label>
+                <label>
+                    <input type="radio" name="engine" value="google" />
+                    Google
+                </label>
+            </div>
+            <button class="search-btn" id="searchBtn">搜索</button>
         </div>
-        <button class="search-btn" id="searchBtn">搜索</button>
-    </div>
 
-    <script>
-        function performSearch() {
-            const query = document.getElementById('searchInput').value.trim();
-            if (!query) return;
-            
-            const engine = document.querySelector('input[name="engine"]:checked').value;
-            const urls = {
-                bing: 'https://www.bing.com/search?q=',
-                google: 'https://www.google.com/search?q='
-            };
-            
-            window.open(urls[engine] + encodeURIComponent(query), '_blank');
-        }
+        <script>
+            function performSearch() {
+                const query = document
+                    .getElementById("searchInput")
+                    .value.trim();
+                if (!query) return;
 
-        // 搜索功能事件监听
-        document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.getElementById('searchInput');
-            const searchBtn = document.getElementById('searchBtn');
+                const engine = document.querySelector(
+                    'input[name="engine"]:checked',
+                ).value;
+                const urls = {
+                    bing: "https://www.bing.com/search?q=",
+                    google: "https://www.google.com/search?q=",
+                };
 
-            // 搜索按钮点击事件
-            searchBtn.addEventListener('click', performSearch);
+                window.open(urls[engine] + encodeURIComponent(query), "_blank");
+            }
 
-            // 回车键搜索
-            searchInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    performSearch();
-                }
-            });
-        });
+            // 搜索功能事件监听
+            document.addEventListener("DOMContentLoaded", function () {
+                const searchInput = document.getElementById("searchInput");
+                const searchBtn = document.getElementById("searchBtn");
 
-        // 极简可靠的tooltip功能 - 最终版本
-        document.addEventListener('DOMContentLoaded', function() {
-            const tooltip = document.createElement('div');
-            tooltip.className = 'tooltip';
-            document.body.appendChild(tooltip);
+                // 搜索按钮点击事件
+                searchBtn.addEventListener("click", performSearch);
 
-            let currentTimer = null;
-
-            // 强制隐藏tooltip
-            function forceHideTooltip() {
-                if (currentTimer) {
-                    clearTimeout(currentTimer);
-                    currentTimer = null;
-                }
-
-                tooltip.className = 'tooltip'; // 重置所有class
-                tooltip.style.display = 'none'; // 强制隐藏
-                tooltip.style.visibility = 'hidden'; // 额外保险
-                tooltip.style.opacity = '0'; // 额外保险
-                tooltip.textContent = '';
-
-                // 恢复所有title属性
-                document.querySelectorAll('.link-item').forEach(item => {
-                    const dataTitle = item.getAttribute('data-title');
-                    if (dataTitle) {
-                        item.setAttribute('title', dataTitle);
-                        item.removeAttribute('data-title');
+                // 回车键搜索
+                searchInput.addEventListener("keypress", function (e) {
+                    if (e.key === "Enter") {
+                        performSearch();
                     }
                 });
-            }
-
-            // 显示tooltip
-            function showTooltip(element) {
-                // 先强制隐藏任何现有tooltip
-                forceHideTooltip();
-
-                const title = element.getAttribute('title');
-                if (!title) return;
-
-                currentTimer = setTimeout(() => {
-                    tooltip.textContent = title;
-                    element.setAttribute('data-title', title);
-                    element.removeAttribute('title');
-
-                    // 重置样式，确保可以正确显示
-                    tooltip.style.display = '';
-                    tooltip.style.visibility = '';
-                    tooltip.style.opacity = '';
-
-                    updateTooltipPosition(element);
-                    tooltip.className = 'tooltip show';
-                    currentTimer = null;
-                }, 200);
-            }
-
-            // 为每个链接单独绑定事件
-            document.querySelectorAll('.link-item').forEach(function(item) {
-                item.addEventListener('mouseenter', function() {
-                    showTooltip(this);
-                });
-
-                item.addEventListener('mouseleave', function() {
-                    forceHideTooltip();
-                });
             });
 
-            // 页面级别的保险措施
-            document.addEventListener('scroll', forceHideTooltip);
-            document.addEventListener('click', forceHideTooltip);
-            window.addEventListener('blur', forceHideTooltip);
+            // 极简可靠的tooltip功能 - 最终版本
+            document.addEventListener("DOMContentLoaded", function () {
+                const tooltip = document.createElement("div");
+                tooltip.className = "tooltip";
+                document.body.appendChild(tooltip);
 
-            // 优化的位置更新函数 - 支持页面滚动
-            function updateTooltipPosition(element) {
-                const buttonRect = element.getBoundingClientRect();
-                const viewportWidth = window.innerWidth;
-                const viewportHeight = window.innerHeight;
+                let currentTimer = null;
 
-                // 临时显示tooltip以获取正确的尺寸
-                tooltip.style.display = 'block';
-                tooltip.style.visibility = 'hidden';
-                tooltip.style.opacity = '0';
+                // 强制隐藏tooltip
+                function forceHideTooltip() {
+                    if (currentTimer) {
+                        clearTimeout(currentTimer);
+                        currentTimer = null;
+                    }
 
-                const tooltipRect = tooltip.getBoundingClientRect();
+                    tooltip.className = "tooltip"; // 重置所有class
+                    tooltip.style.display = "none"; // 强制隐藏
+                    tooltip.style.visibility = "hidden"; // 额外保险
+                    tooltip.style.opacity = "0"; // 额外保险
+                    tooltip.textContent = "";
 
-                // 计算理想位置（元素上方居中）
-                let left = buttonRect.left + (buttonRect.width / 2) - (tooltipRect.width / 2);
-                let top = buttonRect.top - tooltipRect.height - 8;
-
-                // 垂直位置边界检测
-                if (top < 8) {
-                    // 上方空间不够，放到下方
-                    top = buttonRect.bottom + 8;
+                    // 恢复所有title属性
+                    document.querySelectorAll(".link-item").forEach((item) => {
+                        const dataTitle = item.getAttribute("data-title");
+                        if (dataTitle) {
+                            item.setAttribute("title", dataTitle);
+                            item.removeAttribute("data-title");
+                        }
+                    });
                 }
 
-                // 检查下方是否超出视口
-                if (top + tooltipRect.height > viewportHeight - 8) {
-                    // 下方也不够，尝试放在元素中间偏上
-                    top = Math.max(8, buttonRect.top + (buttonRect.height / 2) - (tooltipRect.height / 2));
+                // 显示tooltip
+                function showTooltip(element) {
+                    // 先强制隐藏任何现有tooltip
+                    forceHideTooltip();
+
+                    const title = element.getAttribute("title");
+                    if (!title) return;
+
+                    currentTimer = setTimeout(() => {
+                        tooltip.textContent = title;
+                        element.setAttribute("data-title", title);
+                        element.removeAttribute("title");
+
+                        // 重置样式，确保可以正确显示
+                        tooltip.style.display = "";
+                        tooltip.style.visibility = "";
+                        tooltip.style.opacity = "";
+
+                        updateTooltipPosition(element);
+                        tooltip.className = "tooltip show";
+                        currentTimer = null;
+                    }, 200);
                 }
 
-                // 水平位置边界检测
-                if (left < 8) {
-                    left = 8;
-                } else if (left + tooltipRect.width > viewportWidth - 8) {
-                    left = viewportWidth - tooltipRect.width - 8;
+                // 为每个链接单独绑定事件
+                document
+                    .querySelectorAll(".link-item")
+                    .forEach(function (item) {
+                        item.addEventListener("mouseenter", function () {
+                            showTooltip(this);
+                        });
+
+                        item.addEventListener("mouseleave", function () {
+                            forceHideTooltip();
+                        });
+                    });
+
+                // 页面级别的保险措施
+                document.addEventListener("scroll", forceHideTooltip);
+                document.addEventListener("click", forceHideTooltip);
+                window.addEventListener("blur", forceHideTooltip);
+
+                // 优化的位置更新函数 - 支持页面滚动
+                function updateTooltipPosition(element) {
+                    const buttonRect = element.getBoundingClientRect();
+                    const viewportWidth = window.innerWidth;
+                    const viewportHeight = window.innerHeight;
+
+                    // 临时显示tooltip以获取正确的尺寸
+                    tooltip.style.display = "block";
+                    tooltip.style.visibility = "hidden";
+                    tooltip.style.opacity = "0";
+
+                    const tooltipRect = tooltip.getBoundingClientRect();
+
+                    // 计算理想位置（元素上方居中）
+                    let left =
+                        buttonRect.left +
+                        buttonRect.width / 2 -
+                        tooltipRect.width / 2;
+                    let top = buttonRect.top - tooltipRect.height - 8;
+
+                    // 垂直位置边界检测
+                    if (top < 8) {
+                        // 上方空间不够，放到下方
+                        top = buttonRect.bottom + 8;
+                    }
+
+                    // 检查下方是否超出视口
+                    if (top + tooltipRect.height > viewportHeight - 8) {
+                        // 下方也不够，尝试放在元素中间偏上
+                        top = Math.max(
+                            8,
+                            buttonRect.top +
+                                buttonRect.height / 2 -
+                                tooltipRect.height / 2,
+                        );
+                    }
+
+                    // 水平位置边界检测
+                    if (left < 8) {
+                        left = 8;
+                    } else if (left + tooltipRect.width > viewportWidth - 8) {
+                        left = viewportWidth - tooltipRect.width - 8;
+                    }
+
+                    // 应用位置并显示
+                    tooltip.style.left = left + "px";
+                    tooltip.style.top = top + "px";
+                    tooltip.style.visibility = "visible";
+                    tooltip.style.opacity = "1";
                 }
+            });
+        </script>
 
-                // 应用位置并显示
-                tooltip.style.left = left + 'px';
-                tooltip.style.top = top + 'px';
-                tooltip.style.visibility = 'visible';
-                tooltip.style.opacity = '1';
-            }
-        });
-    </script>
+        <div class="container">
+            <!-- 左侧边栏 -->
+            <div class="sidebar">
+                <!-- 搜索 -->
+                <div class="section">
+                    <div class="section-title">🔍 搜索</div>
+                    <div class="links-grid">
+                        <a
+                            href="https://www.bing.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="微软推出的搜索引擎，提供网页搜索和每日精美壁纸"
+                            >必应</a
+                        >
+                        <a
+                            href="https://www.baidu.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="中国最大的搜索引擎，提供中文网页、图片、视频搜索"
+                            >百度</a
+                        >
+                        <a
+                            href="https://www.google.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="全球最大的搜索引擎，提供网页、图片、视频等搜索服务"
+                            >Google</a
+                        >
+                    </div>
+                </div>
 
-    <div class="container">
-        <!-- 左侧边栏 -->
-        <div class="sidebar">
-            <!-- 搜索 -->
-            <div class="section">
-                <div class="section-title">🔍 搜索</div>
-                <div class="links-grid">
-                    <a href="https://www.bing.com/" class="link-item" target="_blank" title="微软推出的搜索引擎，提供网页搜索和每日精美壁纸">必应</a>
-                    <a href="https://www.baidu.com/" class="link-item" target="_blank" title="中国最大的搜索引擎，提供中文网页、图片、视频搜索">百度</a>
-                    <a href="https://www.google.com/" class="link-item" target="_blank" title="全球最大的搜索引擎，提供网页、图片、视频等搜索服务">Google</a>
+                <!-- 办公 -->
+                <div class="section">
+                    <div class="section-title">📧 办公</div>
+                    <div class="links-grid">
+                        <!-- 国产办公服务 -->
+                        <a
+                            href="https://www.wps.cn/"
+                            class="link-item"
+                            target="_blank"
+                            title="WPS Office，国产办公软件套件，支持文档、表格、演示文稿编辑"
+                            >WPS Office</a
+                        >
+                        <a
+                            href="https://www.feishu.cn/"
+                            class="link-item"
+                            target="_blank"
+                            title="飞书，字节跳动推出的协作办公平台"
+                            >飞书</a
+                        >
+                        <a
+                            href="https://docs.qq.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="腾讯文档，在线文档编辑和协作平台"
+                            >腾讯文档</a
+                        >
+                        <a
+                            href="https://mail.qq.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="腾讯QQ邮箱，提供免费邮件收发服务"
+                            >QQ邮箱</a
+                        >
+                        <a
+                            href="https://mail.163.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="网易163邮箱，老牌免费邮箱服务"
+                            >163邮箱</a
+                        >
+
+                        <!-- 国际办公服务 -->
+                        <a
+                            href="https://www.office.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="Microsoft Office 365，微软办公软件套件，包含Word、Excel、PowerPoint等"
+                            >Office 365</a
+                        >
+                        <a
+                            href="https://mail.google.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="Google Gmail，功能强大的免费邮箱服务"
+                            >Gmail</a
+                        >
+                    </div>
                 </div>
             </div>
 
-            <!-- 办公 -->
-            <div class="section">
-                <div class="section-title">📧 办公</div>
-                <div class="links-grid">
-                    <!-- 国产办公服务 -->
-                    <a href="https://www.wps.cn/" class="link-item" target="_blank" title="WPS Office，国产办公软件套件，支持文档、表格、演示文稿编辑">WPS Office</a>
-                    <a href="https://www.feishu.cn/" class="link-item" target="_blank" title="飞书，字节跳动推出的协作办公平台">飞书</a>
-                    <a href="https://docs.qq.com/" class="link-item" target="_blank" title="腾讯文档，在线文档编辑和协作平台">腾讯文档</a>
-                    <a href="https://mail.qq.com/" class="link-item" target="_blank" title="腾讯QQ邮箱，提供免费邮件收发服务">QQ邮箱</a>
-                    <a href="https://mail.163.com/" class="link-item" target="_blank" title="网易163邮箱，老牌免费邮箱服务">163邮箱</a>
+            <!-- 右侧主内容区 -->
+            <div class="main-content">
+                <!-- 右侧主内容区 -->
+                <!-- 社交 -->
+                <div class="section">
+                    <div class="section-title">💬 社交</div>
+                    <div class="links-grid">
+                        <!-- 国产社交平台 -->
+                        <a
+                            href="https://weibo.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="新浪微博，中国最大的社交媒体平台"
+                            >微博</a
+                        >
+                        <a
+                            href="https://mp.weixin.qq.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="微信公众平台，微信官方的公众号管理后台"
+                            >微信公众平台</a
+                        >
+                        <a
+                            href="https://www.zhihu.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="知乎，中文互联网高质量的问答社区"
+                            >知乎</a
+                        >
+                        <a
+                            href="https://www.xiaohongshu.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="小红书，年轻人的生活方式平台和消费决策入口"
+                            >小红书</a
+                        >
+                        <a
+                            href="https://www.douban.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="豆瓣，文艺青年聚集的书影音评分平台"
+                            >豆瓣</a
+                        >
 
-                    <!-- 国际办公服务 -->
-                    <a href="https://www.office.com/" class="link-item" target="_blank" title="Microsoft Office 365，微软办公软件套件，包含Word、Excel、PowerPoint等">Office 365</a>
-                    <a href="https://mail.google.com/" class="link-item" target="_blank" title="Google Gmail，功能强大的免费邮箱服务">Gmail</a>
+                        <!-- 国际社交平台 -->
+                        <a
+                            href="https://x.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="Twitter (X)，全球知名的社交媒体平台"
+                            >Twitter (X)</a
+                        >
+                    </div>
+                </div>
+
+                <!-- AI -->
+                <div class="section">
+                    <div class="section-title">🤖 AI</div>
+                    <div class="links-grid">
+                        <!-- 国产AI服务 -->
+                        <a
+                            href="https://www.qianwen.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="阿里云推出的大语言模型，提供智能对话服务"
+                            >通义千问</a
+                        >
+                        <a
+                            href="https://kimi.moonshot.cn/"
+                            class="link-item"
+                            target="_blank"
+                            title="月之暗面推出的AI助手，擅长长文本理解和分析"
+                            >Kimi</a
+                        >
+                        <a
+                            href="https://www.doubao.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="字节跳动推出的AI聊天助手，支持多种对话场景"
+                            >豆包</a
+                        >
+                        <a
+                            href="https://www.deepseek.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="DeepSeek AI，专注于深度学习和推理的AI助手"
+                            >DeepSeek</a
+                        >
+                        <a
+                            href="https://ima.qq.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="腾讯IMA会思考的知识库，智能整理和分析知识内容"
+                            >腾讯IMA</a
+                        >
+                        <a
+                            href="https://klingai.kuaishou.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="快手推出的AI视频生成工具，轻松创作短视频内容"
+                            >可灵AI</a
+                        >
+                        <a
+                            href="https://jimeng.jianying.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="剪映推出的AI创意工具，智能生成视频和图像"
+                            >即梦AI</a
+                        >
+                        <a
+                            href="https://www.biji.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="AI驱动的智能笔记工具，帮助整理和管理知识"
+                            >Get笔记</a
+                        >
+                        <a
+                            href="https://iflow.cn/"
+                            class="link-item"
+                            target="_blank"
+                            title="心流CLI，智能的软件工程助手"
+                            >心流AI</a
+                        >
+                        <a
+                            href="https://www.yourmusic.fun/"
+                            class="link-item"
+                            target="_blank"
+                            title="AI音乐创作平台，让每个人都能创作属于自己的音乐"
+                            >YourMusic</a
+                        >
+
+                        <!-- 国际AI服务 -->
+                        <a
+                            href="https://chatgpt.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="OpenAI开发的AI聊天机器人，功能强大的对话AI"
+                            >ChatGPT</a
+                        >
+                        <a
+                            href="https://gemini.google.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="Google推出的多模态AI助手，支持文本、图像和代码"
+                            >Gemini</a
+                        >
+                        <a
+                            href="https://copilot.microsoft.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="微软AI助手，集成在Office和Windows中的智能助手"
+                            >Copilot</a
+                        >
+                        <a
+                            href="https://notebooklm.google/"
+                            class="link-item"
+                            target="_blank"
+                            title="Google推出的AI笔记本，智能整理和分析文档内容"
+                            >NotebookLM</a
+                        >
+                        <a
+                            href="https://aistudio.google.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="Google AI开发平台，构建和部署AI应用的工具"
+                            >Google AI Studio</a
+                        >
+                        <a
+                            href="https://labs.google/fx/tools/flow"
+                            class="link-item"
+                            target="_blank"
+                            title="Google实验室的Flow工具，AI驱动的创意工作流"
+                            >Google Flow</a
+                        >
+                        <a
+                            href="https://suno.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="AI音乐生成平台，通过文本描述创作原创音乐"
+                            >Suno</a
+                        >
+                        <a
+                            href="https://elevenlabs.io/"
+                            class="link-item"
+                            target="_blank"
+                            title="ElevenLabs AI语音合成平台，生成逼真的人工智能语音"
+                            >ElevenLabs</a
+                        >
+                    </div>
+                </div>
+
+                <!-- 工具 -->
+                <div class="section">
+                    <div class="section-title">🛠️ 工具</div>
+                    <div class="links-grid">
+                        <!-- 地图导航 -->
+                        <a
+                            href="https://ditu.amap.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="高德地图，提供精准的地图导航和位置服务"
+                            >高德地图</a
+                        >
+                        <a
+                            href="https://maps.google.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="谷歌地图，全球地图服务和导航工具"
+                            >谷歌地图</a
+                        >
+                        <a
+                            href="https://earth.google.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="谷歌地球，探索世界各地的卫星图像和3D地形"
+                            >谷歌地球</a
+                        >
+
+                        <!-- 云存储 -->
+                        <a
+                            href="https://www.weiyun.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="微云，腾讯推出的云存储服务，安全可靠的文件同步与分享"
+                            >微云</a
+                        >
+                        <a
+                            href="https://pan.baidu.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="百度网盘，提供大容量云存储和文件同步"
+                            >百度网盘</a
+                        >
+                        <a
+                            href="https://www.aliyundrive.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="阿里云盘，阿里巴巴推出的云存储服务"
+                            >阿里云盘</a
+                        >
+
+                        <!-- 开发设计 -->
+                        <a
+                            href="https://gitee.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="国内领先的代码托管平台，支持Git和SVN"
+                            >Gitee</a
+                        >
+                        <a
+                            href="https://www.yinxiang.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="印象笔记，专业的笔记和知识管理工具"
+                            >印象笔记</a
+                        >
+                        <a
+                            href="https://github.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="全球最大的代码托管平台，开源项目的聚集地"
+                            >GitHub</a
+                        >
+                        <a
+                            href="https://www.figma.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="专业的UI/UX设计工具，支持团队协作"
+                            >Figma</a
+                        >
+                        <a
+                            href="https://www.canva.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="简单易用的图形设计平台，丰富的模板库"
+                            >Canva</a
+                        >
+                        <a
+                            href="https://app.diagrams.net/"
+                            class="link-item"
+                            target="_blank"
+                            title="免费的在线流程图和图表绘制工具"
+                            >Draw.io</a
+                        >
+                        <a
+                            href="https://excalidraw.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="简洁的手绘风格图表和白板工具"
+                            >Excalidraw</a
+                        >
+                        <a
+                            href="https://app.standardnotes.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="Standard Notes，注重隐私和安全的开源笔记应用"
+                            >Standard Notes</a
+                        >
+                        <a
+                            href="https://www.geogebra.org/"
+                            class="link-item"
+                            target="_blank"
+                            title="GeoGebra，免费的数学软件，支持几何、代数、统计和微积分"
+                            >GeoGebra</a
+                        >
+                    </div>
+                </div>
+
+                <!-- 生活 -->
+                <div class="section">
+                    <div class="section-title">🏠 生活</div>
+                    <div class="links-grid">
+                        <a
+                            href="https://www.taobao.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="阿里巴巴旗下购物网站，万能的网购平台"
+                            >淘宝</a
+                        >
+                        <a
+                            href="https://www.jd.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="京东商城，品质保证的综合电商平台"
+                            >京东</a
+                        >
+                        <a
+                            href="https://www.12306.cn/"
+                            class="link-item"
+                            target="_blank"
+                            title="中国铁路客户服务中心，火车票预订官网"
+                            >12306</a
+                        >
+                        <a
+                            href="https://www.ctrip.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="携程旅行网，一站式旅游服务平台"
+                            >携程</a
+                        >
+                        <a
+                            href="https://www.qunar.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="去哪儿网，旅游产品搜索和比价平台"
+                            >去哪儿</a
+                        >
+                        <a
+                            href="https://www.fliggy.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="阿里旅行·飞猪，年轻人的旅行平台"
+                            >飞猪</a
+                        >
+                        <a
+                            href="https://www.alipay.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="支付宝，数字生活开放平台"
+                            >支付宝</a
+                        >
+                        <a
+                            href="https://www.meituan.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="美团，生活服务电商平台"
+                            >美团</a
+                        >
+                        <a
+                            href="https://www.dianping.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="大众点评，本地生活信息及交易平台"
+                            >大众点评</a
+                        >
+                    </div>
+                </div>
+
+                <!-- 娱乐 -->
+                <div class="section">
+                    <div class="section-title">🎬 娱乐</div>
+                    <div class="links-grid">
+                        <!-- 国产娱乐平台 -->
+                        <a
+                            href="https://www.bilibili.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="哔哩哔哩，年轻人聚集的弹幕视频网站"
+                            >哔哩哔哩</a
+                        >
+                        <a
+                            href="https://www.douyin.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="抖音，记录美好生活的短视频平台"
+                            >抖音</a
+                        >
+                        <a
+                            href="https://v.qq.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="腾讯视频，不负好时光的视频平台"
+                            >腾讯视频</a
+                        >
+                        <a
+                            href="https://www.iqiyi.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="爱奇艺，悦享品质的视频娱乐平台"
+                            >爱奇艺</a
+                        >
+                        <a
+                            href="https://www.youku.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="优酷视频，这世界很酷的视频平台"
+                            >优酷</a
+                        >
+                        <a
+                            href="https://music.163.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="网易云音乐，音乐的力量的音乐平台"
+                            >网易云音乐</a
+                        >
+                        <a
+                            href="https://y.qq.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="QQ音乐，听我想听的音乐平台"
+                            >QQ音乐</a
+                        >
+                        <a
+                            href="https://www.kugou.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="酷狗音乐，就是歌多的数字音乐平台"
+                            >酷狗音乐</a
+                        >
+
+                        <!-- 国际娱乐平台 -->
+                        <a
+                            href="https://www.youtube.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="YouTube，全球最大的视频分享平台"
+                            >YouTube</a
+                        >
+                    </div>
                 </div>
             </div>
         </div>
-
-        <!-- 右侧主内容区 -->
-        <div class="main-content">
-<!-- 右侧主内容区 -->
-        <!-- 社交 -->
-        <div class="section">
-            <div class="section-title">💬 社交</div>
-            <div class="links-grid">
-                <!-- 国产社交平台 -->
-                <a href="https://weibo.com/" class="link-item" target="_blank" title="新浪微博，中国最大的社交媒体平台">微博</a>
-                <a href="https://www.zhihu.com/" class="link-item" target="_blank" title="知乎，中文互联网高质量的问答社区">知乎</a>
-                <a href="https://www.xiaohongshu.com/" class="link-item" target="_blank" title="小红书，年轻人的生活方式平台和消费决策入口">小红书</a>
-                <a href="https://www.douban.com/" class="link-item" target="_blank" title="豆瓣，文艺青年聚集的书影音评分平台">豆瓣</a>
-
-                <!-- 国际社交平台 -->
-                <a href="https://x.com/" class="link-item" target="_blank" title="Twitter (X)，全球知名的社交媒体平台">Twitter (X)</a>
-            </div>
-        </div>
-
-        <!-- AI -->
-        <div class="section">
-            <div class="section-title">🤖 AI</div>
-            <div class="links-grid">
-                <!-- 国产AI服务 -->
-                <a href="https://www.qianwen.com/" class="link-item" target="_blank" title="阿里云推出的大语言模型，提供智能对话服务">通义千问</a>
-                <a href="https://kimi.moonshot.cn/" class="link-item" target="_blank" title="月之暗面推出的AI助手，擅长长文本理解和分析">Kimi</a>
-                <a href="https://www.doubao.com/" class="link-item" target="_blank" title="字节跳动推出的AI聊天助手，支持多种对话场景">豆包</a>
-                <a href="https://www.deepseek.com/" class="link-item" target="_blank" title="DeepSeek AI，专注于深度学习和推理的AI助手">DeepSeek</a>
-                <a href="https://ima.qq.com/" class="link-item" target="_blank" title="腾讯IMA会思考的知识库，智能整理和分析知识内容">腾讯IMA</a>
-                <a href="https://klingai.kuaishou.com/" class="link-item" target="_blank" title="快手推出的AI视频生成工具，轻松创作短视频内容">可灵AI</a>
-                <a href="https://jimeng.jianying.com/" class="link-item" target="_blank" title="剪映推出的AI创意工具，智能生成视频和图像">即梦AI</a>
-                <a href="https://www.biji.com/" class="link-item" target="_blank" title="AI驱动的智能笔记工具，帮助整理和管理知识">Get笔记</a>
-                <a href="https://iflow.cn/" class="link-item" target="_blank" title="心流CLI，智能的软件工程助手">心流AI</a>
-                <a href="https://www.yourmusic.fun/" class="link-item" target="_blank" title="AI音乐创作平台，让每个人都能创作属于自己的音乐">YourMusic</a>
-
-                <!-- 国际AI服务 -->
-                <a href="https://chatgpt.com/" class="link-item" target="_blank" title="OpenAI开发的AI聊天机器人，功能强大的对话AI">ChatGPT</a>
-                <a href="https://gemini.google.com/" class="link-item" target="_blank" title="Google推出的多模态AI助手，支持文本、图像和代码">Gemini</a>
-                <a href="https://copilot.microsoft.com/" class="link-item" target="_blank" title="微软AI助手，集成在Office和Windows中的智能助手">Copilot</a>
-                <a href="https://notebooklm.google/" class="link-item" target="_blank" title="Google推出的AI笔记本，智能整理和分析文档内容">NotebookLM</a>
-                <a href="https://aistudio.google.com/" class="link-item" target="_blank" title="Google AI开发平台，构建和部署AI应用的工具">Google AI Studio</a>
-                <a href="https://labs.google/fx/tools/flow" class="link-item" target="_blank" title="Google实验室的Flow工具，AI驱动的创意工作流">Google Flow</a>
-                <a href="https://suno.com/" class="link-item" target="_blank" title="AI音乐生成平台，通过文本描述创作原创音乐">Suno</a>
-                <a href="https://elevenlabs.io/" class="link-item" target="_blank" title="ElevenLabs AI语音合成平台，生成逼真的人工智能语音">ElevenLabs</a>
-            </div>
-        </div>
-
-        <!-- 工具 -->
-        <div class="section">
-            <div class="section-title">🛠️ 工具</div>
-            <div class="links-grid">
-                <!-- 地图导航 -->
-                <a href="https://ditu.amap.com/" class="link-item" target="_blank" title="高德地图，提供精准的地图导航和位置服务">高德地图</a>
-                <a href="https://maps.google.com/" class="link-item" target="_blank" title="谷歌地图，全球地图服务和导航工具">谷歌地图</a>
-                <a href="https://earth.google.com/" class="link-item" target="_blank" title="谷歌地球，探索世界各地的卫星图像和3D地形">谷歌地球</a>
-
-                <!-- 云存储 -->
-                <a href="https://www.weiyun.com/" class="link-item" target="_blank" title="微云，腾讯推出的云存储服务，安全可靠的文件同步与分享">微云</a>
-                <a href="https://pan.baidu.com/" class="link-item" target="_blank" title="百度网盘，提供大容量云存储和文件同步">百度网盘</a>
-                <a href="https://www.aliyundrive.com/" class="link-item" target="_blank" title="阿里云盘，阿里巴巴推出的云存储服务">阿里云盘</a>
-
-                <!-- 开发设计 -->
-                <a href="https://gitee.com/" class="link-item" target="_blank" title="国内领先的代码托管平台，支持Git和SVN">Gitee</a>
-                <a href="https://www.yinxiang.com/" class="link-item" target="_blank" title="印象笔记，专业的笔记和知识管理工具">印象笔记</a>
-                <a href="https://github.com/" class="link-item" target="_blank" title="全球最大的代码托管平台，开源项目的聚集地">GitHub</a>
-                <a href="https://www.figma.com/" class="link-item" target="_blank" title="专业的UI/UX设计工具，支持团队协作">Figma</a>
-                <a href="https://www.canva.com/" class="link-item" target="_blank" title="简单易用的图形设计平台，丰富的模板库">Canva</a>
-                <a href="https://app.diagrams.net/" class="link-item" target="_blank" title="免费的在线流程图和图表绘制工具">Draw.io</a>
-                <a href="https://excalidraw.com/" class="link-item" target="_blank" title="简洁的手绘风格图表和白板工具">Excalidraw</a>
-                <a href="https://app.standardnotes.com/" class="link-item" target="_blank" title="Standard Notes，注重隐私和安全的开源笔记应用">Standard Notes</a>
-                <a href="https://www.geogebra.org/" class="link-item" target="_blank" title="GeoGebra，免费的数学软件，支持几何、代数、统计和微积分">GeoGebra</a>
-            </div>
-        </div>
-
-        <!-- 生活 -->
-        <div class="section">
-            <div class="section-title">🏠 生活</div>
-            <div class="links-grid">
-                <a href="https://www.taobao.com/" class="link-item" target="_blank" title="阿里巴巴旗下购物网站，万能的网购平台">淘宝</a>
-                <a href="https://www.jd.com/" class="link-item" target="_blank" title="京东商城，品质保证的综合电商平台">京东</a>
-                <a href="https://www.12306.cn/" class="link-item" target="_blank" title="中国铁路客户服务中心，火车票预订官网">12306</a>
-                <a href="https://www.ctrip.com/" class="link-item" target="_blank" title="携程旅行网，一站式旅游服务平台">携程</a>
-                <a href="https://www.qunar.com/" class="link-item" target="_blank" title="去哪儿网，旅游产品搜索和比价平台">去哪儿</a>
-                <a href="https://www.fliggy.com/" class="link-item" target="_blank" title="阿里旅行·飞猪，年轻人的旅行平台">飞猪</a>
-                <a href="https://www.alipay.com/" class="link-item" target="_blank" title="支付宝，数字生活开放平台">支付宝</a>
-                <a href="https://www.meituan.com/" class="link-item" target="_blank" title="美团，生活服务电商平台">美团</a>
-                <a href="https://www.dianping.com/" class="link-item" target="_blank" title="大众点评，本地生活信息及交易平台">大众点评</a>
-            </div>
-        </div>
-
-        <!-- 娱乐 -->
-        <div class="section">
-            <div class="section-title">🎬 娱乐</div>
-            <div class="links-grid">
-                <!-- 国产娱乐平台 -->
-                <a href="https://www.bilibili.com/" class="link-item" target="_blank" title="哔哩哔哩，年轻人聚集的弹幕视频网站">哔哩哔哩</a>
-                <a href="https://www.douyin.com/" class="link-item" target="_blank" title="抖音，记录美好生活的短视频平台">抖音</a>
-                <a href="https://v.qq.com/" class="link-item" target="_blank" title="腾讯视频，不负好时光的视频平台">腾讯视频</a>
-                <a href="https://www.iqiyi.com/" class="link-item" target="_blank" title="爱奇艺，悦享品质的视频娱乐平台">爱奇艺</a>
-                <a href="https://www.youku.com/" class="link-item" target="_blank" title="优酷视频，这世界很酷的视频平台">优酷</a>
-                <a href="https://music.163.com/" class="link-item" target="_blank" title="网易云音乐，音乐的力量的音乐平台">网易云音乐</a>
-                <a href="https://y.qq.com/" class="link-item" target="_blank" title="QQ音乐，听我想听的音乐平台">QQ音乐</a>
-                <a href="https://www.kugou.com/" class="link-item" target="_blank" title="酷狗音乐，就是歌多的数字音乐平台">酷狗音乐</a>
-
-                <!-- 国际娱乐平台 -->
-                <a href="https://www.youtube.com/" class="link-item" target="_blank" title="YouTube，全球最大的视频分享平台">YouTube</a>
-            </div>
-        </div>
-
-        </div>
-    </div>
-</body>
+    </body>
 </html>
