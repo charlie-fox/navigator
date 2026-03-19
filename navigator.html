@@ -111,7 +111,6 @@
                 height: 16px;
             }
 
-            /* 为不支持accent-color的浏览器提供备用样式 */
             .search-engines input[type="radio"]:checked {
                 background-color: #8b5cf6;
                 border-color: #8b5cf6;
@@ -174,55 +173,27 @@
                 gap: 8px;
             }
 
-            /* 简洁的标题颜色方案 */
-            .sidebar .section:nth-child(1) {
-                --section-color: #1e40af;
-            }
-            .sidebar .section:nth-child(1) .section-title {
-                color: #1e40af;
-            } /* 搜索 - 深蓝 */
+            /* 分区标题颜色方案 */
+            .sidebar .section:nth-child(1) { --section-color: #1e40af; } /* 搜索 - 深蓝 */
+            .sidebar .section:nth-child(1) .section-title { color: #1e40af; }
 
-            .sidebar .section:nth-child(2) {
-                --section-color: #047857;
-            }
-            .sidebar .section:nth-child(2) .section-title {
-                color: #047857;
-            } /* 办公 - 深绿 */
+            .sidebar .section:nth-child(2) { --section-color: #047857; } /* 办公 - 深绿 */
+            .sidebar .section:nth-child(2) .section-title { color: #047857; }
 
-            .main-content .section:nth-child(1) {
-                --section-color: #b45309;
-            }
-            .main-content .section:nth-child(1) .section-title {
-                color: #b45309;
-            } /* 社交 - 深橙 */
+            .main-content .section:nth-child(1) { --section-color: #b45309; } /* 社交 - 深橙 */
+            .main-content .section:nth-child(1) .section-title { color: #b45309; }
 
-            .main-content .section:nth-child(2) {
-                --section-color: #6d28d9;
-            }
-            .main-content .section:nth-child(2) .section-title {
-                color: #6d28d9;
-            } /* AI - 深紫 */
+            .main-content .section:nth-child(2) { --section-color: #6d28d9; } /* AI - 深紫 */
+            .main-content .section:nth-child(2) .section-title { color: #6d28d9; }
 
-            .main-content .section:nth-child(3) {
-                --section-color: #4338ca;
-            }
-            .main-content .section:nth-child(3) .section-title {
-                color: #4338ca;
-            } /* 工具 - 深蓝紫 */
+            .main-content .section:nth-child(3) { --section-color: #4338ca; } /* 工具 - 深蓝紫 */
+            .main-content .section:nth-child(3) .section-title { color: #4338ca; }
 
-            .main-content .section:nth-child(4) {
-                --section-color: #be185d;
-            }
-            .main-content .section:nth-child(4) .section-title {
-                color: #be185d;
-            } /* 生活 - 深粉 */
+            .main-content .section:nth-child(4) { --section-color: #be185d; } /* 生活 - 深粉 */
+            .main-content .section:nth-child(4) .section-title { color: #be185d; }
 
-            .main-content .section:nth-child(5) {
-                --section-color: #dc2626;
-            }
-            .main-content .section:nth-child(5) .section-title {
-                color: #dc2626;
-            } /* 娱乐 - 深红 */
+            .main-content .section:nth-child(5) { --section-color: #dc2626; } /* 娱乐 - 深红 */
+            .main-content .section:nth-child(5) .section-title { color: #dc2626; }
 
             .links-grid {
                 display: grid;
@@ -282,7 +253,7 @@
                 border-color: var(--section-color, #8b5cf6);
             }
 
-            /* 自定义tooltip样式 */
+            /* Tooltip样式 */
             .tooltip {
                 position: fixed;
                 background: rgba(45, 55, 72, 0.95);
@@ -290,7 +261,6 @@
                 padding: 12px 16px;
                 border-radius: 10px;
                 font-size: 0.8em;
-                white-space: nowrap;
                 z-index: 1000;
                 opacity: 0;
                 pointer-events: none;
@@ -317,7 +287,7 @@
                 border-top-color: rgba(45, 55, 72, 0.95);
             }
 
-            /* 低配置设备优化 */
+            /* 响应式设计和设备优化 */
             @media (prefers-reduced-motion: reduce) {
                 * {
                     animation-duration: 0.01ms !important;
@@ -334,7 +304,6 @@
                 }
             }
 
-            /* 低分辨率设备优化 */
             @media (max-resolution: 150dpi) {
                 .search-bar,
                 .section {
@@ -363,50 +332,39 @@
                     );
                 }
 
-                /* 移动端进一步简化效果 */
-                .search-bar,
-                .section,
-                .tooltip {
+                .search-bar, .section, .tooltip {
                     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
                 }
             }
 
-            /* 超低配置设备 - 完全禁用装饰效果 */
-            @media (max-width: 480px),
-                (pointer: coarse) and (max-device-width: 768px) {
+            @media (max-width: 480px), (pointer: coarse) and (max-device-width: 768px) {
                 body::before {
                     display: none;
                 }
 
-                .link-item::before,
-                .tooltip::after {
+                .link-item::before, .tooltip::after {
                     display: none;
                 }
 
-                .search-bar,
-                .section,
-                .link-item {
+                .search-bar, .section, .link-item {
                     box-shadow: none;
                     border: 1px solid #9ca3af;
                 }
             }
         </style>
     </head>
+
     <body>
         <!-- 搜索栏 -->
         <div class="search-bar">
-            <input
-                type="text"
-                id="searchInput"
-                placeholder="输入关键词搜索..."
-            />
+            <input type="text" id="searchInput" placeholder="输入关键词搜索...">
             <div class="search-engines">
                 <label>
-                    <input type="radio" name="engine" value="bing" checked />
+                    <input type="radio" name="engine" value="bing" checked>
                     Bing
                 </label>
                 <label>
-                    <input type="radio" name="engine" value="google" />
+                    <input type="radio" name="engine" value="google">
                     Google
                 </label>
             </div>
@@ -420,37 +378,32 @@
                     .value.trim();
                 if (!query) return;
 
-                const engine = document.querySelector(
-                    'input[name="engine"]:checked',
-                ).value;
+                const engine = document.querySelector('input[name="engine"]:checked').value;
                 const urls = {
-                    bing: "https://www.bing.com/search?q=",
-                    google: "https://www.google.com/search?q=",
+                    bing: 'https://www.bing.com/search?q=',
+                    google: 'https://www.google.com/search?q='
                 };
 
-                window.open(urls[engine] + encodeURIComponent(query), "_blank");
+                window.open(urls[engine] + encodeURIComponent(query), '_blank');
             }
 
-            // 搜索功能事件监听
-            document.addEventListener("DOMContentLoaded", function () {
-                const searchInput = document.getElementById("searchInput");
-                const searchBtn = document.getElementById("searchBtn");
+            // 搜索事件监听
+            document.addEventListener('DOMContentLoaded', function () {
+                const searchInput = document.getElementById('searchInput');
+                const searchBtn = document.getElementById('searchBtn');
 
-                // 搜索按钮点击事件
-                searchBtn.addEventListener("click", performSearch);
-
-                // 回车键搜索
-                searchInput.addEventListener("keypress", function (e) {
-                    if (e.key === "Enter") {
+                searchBtn.addEventListener('click', performSearch);
+                searchInput.addEventListener('keypress', function (e) {
+                    if (e.key === 'Enter') {
                         performSearch();
                     }
                 });
             });
 
-            // 极简可靠的tooltip功能 - 最终版本
-            document.addEventListener("DOMContentLoaded", function () {
-                const tooltip = document.createElement("div");
-                tooltip.className = "tooltip";
+            // Tooltip功能实现
+            document.addEventListener('DOMContentLoaded', function () {
+                const tooltip = document.createElement('div');
+                tooltip.className = 'tooltip';
                 document.body.appendChild(tooltip);
 
                 let currentTimer = null;
@@ -462,50 +415,44 @@
                         currentTimer = null;
                     }
 
-                    tooltip.className = "tooltip"; // 重置所有class
-                    tooltip.style.display = "none"; // 强制隐藏
-                    tooltip.style.visibility = "hidden"; // 额外保险
-                    tooltip.style.opacity = "0"; // 额外保险
-                    tooltip.textContent = "";
+                    tooltip.className = 'tooltip';
+                    tooltip.style.display = 'none';
+                    tooltip.style.visibility = 'hidden';
+                    tooltip.style.opacity = '0';
+                    tooltip.textContent = '';
 
-                    // 恢复所有title属性
-                    document.querySelectorAll(".link-item").forEach((item) => {
-                        const dataTitle = item.getAttribute("data-title");
+                    document.querySelectorAll('.link-item').forEach((item) => {
+                        const dataTitle = item.getAttribute('data-title');
                         if (dataTitle) {
-                            item.setAttribute("title", dataTitle);
-                            item.removeAttribute("data-title");
+                            item.setAttribute('title', dataTitle);
+                            item.removeAttribute('data-title');
                         }
                     });
                 }
 
-                // 显示tooltip
                 function showTooltip(element) {
-                    // 先强制隐藏任何现有tooltip
                     forceHideTooltip();
 
-                    const title = element.getAttribute("title");
+                    const title = element.getAttribute('title');
                     if (!title) return;
 
                     currentTimer = setTimeout(() => {
                         tooltip.textContent = title;
-                        element.setAttribute("data-title", title);
-                        element.removeAttribute("title");
+                        element.setAttribute('data-title', title);
+                        element.removeAttribute('title');
 
-                        // 重置样式，确保可以正确显示
-                        tooltip.style.display = "";
-                        tooltip.style.visibility = "";
-                        tooltip.style.opacity = "";
+                        tooltip.style.display = '';
+                        tooltip.style.visibility = '';
+                        tooltip.style.opacity = '';
 
                         updateTooltipPosition(element);
-                        tooltip.className = "tooltip show";
+                        tooltip.className = 'tooltip show';
                         currentTimer = null;
                     }, 200);
                 }
 
-                // 为每个链接单独绑定事件
-                document
-                    .querySelectorAll(".link-item")
-                    .forEach(function (item) {
+                // 为每个链接绑定事件
+                document.querySelectorAll(".link-item").forEach(function (item) {
                         item.addEventListener("mouseenter", function () {
                             showTooltip(this);
                         });
@@ -515,12 +462,12 @@
                         });
                     });
 
-                // 页面级别的保险措施
+                // 全局事件监听
                 document.addEventListener("scroll", forceHideTooltip);
                 document.addEventListener("click", forceHideTooltip);
                 window.addEventListener("blur", forceHideTooltip);
 
-                // 优化的位置更新函数 - 支持页面滚动
+                // 位置更新函数
                 function updateTooltipPosition(element) {
                     const buttonRect = element.getBoundingClientRect();
                     const viewportWidth = window.innerWidth;
@@ -533,11 +480,7 @@
 
                     const tooltipRect = tooltip.getBoundingClientRect();
 
-                    // 计算理想位置（元素上方居中）
-                    let left =
-                        buttonRect.left +
-                        buttonRect.width / 2 -
-                        tooltipRect.width / 2;
+                    let left = buttonRect.left + buttonRect.width / 2 - tooltipRect.width / 2;
                     let top = buttonRect.top - tooltipRect.height - 8;
 
                     // 垂直位置边界检测
@@ -564,11 +507,10 @@
                         left = viewportWidth - tooltipRect.width - 8;
                     }
 
-                    // 应用位置并显示
-                    tooltip.style.left = left + "px";
-                    tooltip.style.top = top + "px";
-                    tooltip.style.visibility = "visible";
-                    tooltip.style.opacity = "1";
+                    tooltip.style.left = left + 'px';
+                    tooltip.style.top = top + 'px';
+                    tooltip.style.visibility = 'visible';
+                    tooltip.style.opacity = '1';
                 }
             });
         </script>
@@ -666,7 +608,6 @@
 
             <!-- 右侧主内容区 -->
             <div class="main-content">
-                <!-- 右侧主内容区 -->
                 <!-- 社交 -->
                 <div class="section">
                     <div class="section-title">💬 社交</div>
@@ -685,6 +626,13 @@
                             target="_blank"
                             title="微信公众平台，微信官方的公众号管理后台"
                             >微信公众平台</a
+                        >
+                        <a
+                            href="https://channels.weixin.qq.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="微信视频号，微信官方的短视频平台"
+                            >微信视频号</a
                         >
                         <a
                             href="https://www.zhihu.com/"
@@ -706,6 +654,13 @@
                             target="_blank"
                             title="豆瓣，文艺青年聚集的书影音评分平台"
                             >豆瓣</a
+                        >
+                        <a
+                            href="https://creator.douyin.com/"
+                            class="link-item"
+                            target="_blank"
+                            title="抖音创作者平台，抖音官方的内容创作管理后台"
+                            >抖音创作者平台</a
                         >
 
                         <!-- 国际社交平台 -->
