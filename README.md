@@ -17,7 +17,7 @@
 - 📧 **办公**: WPS Office、Office 365、飞书、腾讯文档、邮箱服务
 
 ### 主内容区
-- 💬 **社交**: 微博、知乎、小红书、豆瓣、Twitter等社交平台
+- 💬 **社交**: 微博、知乎、小红书、豆瓣、Twitter、Discord等社交平台
 - 🤖 **AI**: 通义千问、Kimi、豆包、DeepSeek、ChatGPT、Gemini等AI助手服务
 - ☁️ **云服务**: Oracle Cloud、CloudFlare等云计算和网络安全服务
 - 🛠️ **工具**: 地图导航、云存储、开发工具、设计工具、笔记应用
