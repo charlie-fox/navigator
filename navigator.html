@@ -62,19 +62,30 @@
         "description": "代码托管、云计算与网络"
       },
       {
-        "id": "life",
-        "icon": "🧭",
-        "name": "生活与出行",
-        "description": "购物、地图、存储与本地服务"
-      },
-      {
         "id": "media",
         "icon": "▶️",
         "name": "内容与社区",
         "description": "影音娱乐、社交与内容发布"
+      },
+      {
+        "id": "life",
+        "icon": "🧭",
+        "name": "生活与出行",
+        "description": "购物、地图、存储与本地服务"
       }
     ],
     "services": [
+      {
+        "id": "search-Google",
+        "category": "search",
+        "name": "Google",
+        "url": "https://www.google.com/",
+        "description": "全球最大的搜索引擎，提供网页、图片、视频等搜索服务",
+        "tags": [
+          "搜索",
+          "国际"
+        ]
+      },
       {
         "id": "search-必应",
         "category": "search",
@@ -99,26 +110,25 @@
         ]
       },
       {
-        "id": "search-Google",
-        "category": "search",
-        "name": "Google",
-        "url": "https://www.google.com/",
-        "description": "全球最大的搜索引擎，提供网页、图片、视频等搜索服务",
+        "id": "tools-得到大脑",
+        "category": "productivity",
+        "name": "得到大脑",
+        "url": "https://www.biji.com/",
+        "description": "AI驱动的智能笔记工具，帮助整理和管理知识",
         "tags": [
-          "搜索",
-          "国际"
+          "笔记",
+          "知识库"
         ]
       },
       {
-        "id": "work-WPS Office",
+        "id": "tools-印象笔记",
         "category": "productivity",
-        "name": "WPS Office",
-        "url": "https://www.wps.cn/",
-        "description": "WPS Office，国产办公软件套件，支持文档、表格、演示文稿编辑",
+        "name": "印象笔记",
+        "url": "https://www.yinxiang.com/",
+        "description": "印象笔记，专业的笔记和知识管理工具",
         "tags": [
-          "文档",
-          "表格",
-          "办公"
+          "笔记",
+          "知识库"
         ]
       },
       {
@@ -134,14 +144,14 @@
         ]
       },
       {
-        "id": "work-腾讯文档",
+        "id": "work-Gmail",
         "category": "productivity",
-        "name": "腾讯文档",
-        "url": "https://docs.qq.com/",
-        "description": "腾讯文档，在线文档编辑和协作平台",
+        "name": "Gmail",
+        "url": "https://mail.google.com/",
+        "description": "Google Gmail，功能强大的免费邮箱服务",
         "tags": [
-          "文档",
-          "协作"
+          "邮箱",
+          "邮件"
         ]
       },
       {
@@ -167,6 +177,51 @@
         ]
       },
       {
+        "id": "tools-Draw.io",
+        "category": "productivity",
+        "name": "Draw.io",
+        "url": "https://app.diagrams.net/",
+        "description": "免费的在线流程图和图表绘制工具",
+        "tags": [
+          "图表",
+          "流程图"
+        ]
+      },
+      {
+        "id": "tools-Excalidraw",
+        "category": "productivity",
+        "name": "Excalidraw",
+        "url": "https://excalidraw.com/",
+        "description": "简洁的手绘风格图表和白板工具",
+        "tags": [
+          "白板",
+          "图表"
+        ]
+      },
+      {
+        "id": "work-WPS Office",
+        "category": "productivity",
+        "name": "WPS Office",
+        "url": "https://www.wps.cn/",
+        "description": "WPS Office，国产办公软件套件，支持文档、表格、演示文稿编辑",
+        "tags": [
+          "文档",
+          "表格",
+          "办公"
+        ]
+      },
+      {
+        "id": "work-腾讯文档",
+        "category": "productivity",
+        "name": "腾讯文档",
+        "url": "https://docs.qq.com/",
+        "description": "腾讯文档，在线文档编辑和协作平台",
+        "tags": [
+          "文档",
+          "协作"
+        ]
+      },
+      {
         "id": "work-Microsoft 365",
         "category": "productivity",
         "name": "Microsoft 365",
@@ -176,17 +231,6 @@
           "文档",
           "表格",
           "办公"
-        ]
-      },
-      {
-        "id": "work-Gmail",
-        "category": "productivity",
-        "name": "Gmail",
-        "url": "https://mail.google.com/",
-        "description": "Google Gmail，功能强大的免费邮箱服务",
-        "tags": [
-          "邮箱",
-          "邮件"
         ]
       },
       {
@@ -211,6 +255,28 @@
           "对话",
           "写作",
           "分析"
+        ]
+      },
+      {
+        "id": "ai-DeepSeek",
+        "category": "ai",
+        "name": "DeepSeek",
+        "url": "https://www.deepseek.com/",
+        "description": "DeepSeek AI，专注于深度学习和推理的AI助手",
+        "tags": [
+          "推理",
+          "代码"
+        ]
+      },
+      {
+        "id": "ai-千问",
+        "category": "ai",
+        "name": "千问",
+        "url": "https://www.qianwen.com/",
+        "description": "阿里云推出的大语言模型，提供智能对话服务",
+        "tags": [
+          "对话",
+          "中文"
         ]
       },
       {
@@ -283,17 +349,6 @@
         ]
       },
       {
-        "id": "ai-千问",
-        "category": "ai",
-        "name": "千问",
-        "url": "https://www.qianwen.com/",
-        "description": "阿里云推出的大语言模型，提供智能对话服务",
-        "tags": [
-          "对话",
-          "中文"
-        ]
-      },
-      {
         "id": "ai-Kimi",
         "category": "ai",
         "name": "Kimi",
@@ -314,17 +369,6 @@
         "tags": [
           "对话",
           "中文"
-        ]
-      },
-      {
-        "id": "ai-DeepSeek",
-        "category": "ai",
-        "name": "DeepSeek",
-        "url": "https://www.deepseek.com/",
-        "description": "DeepSeek AI，专注于深度学习和推理的AI助手",
-        "tags": [
-          "推理",
-          "代码"
         ]
       },
       {
@@ -373,17 +417,6 @@
         ]
       },
       {
-        "id": "ai-得到大脑",
-        "category": "ai",
-        "name": "得到大脑",
-        "url": "https://www.biji.com/",
-        "description": "AI驱动的智能笔记工具，帮助整理和管理知识",
-        "tags": [
-          "笔记",
-          "知识库"
-        ]
-      },
-      {
         "id": "ai-YourMusic",
         "category": "ai",
         "name": "YourMusic",
@@ -392,6 +425,30 @@
         "tags": [
           "音乐",
           "生成"
+        ]
+      },
+      {
+        "id": "tools-GitHub",
+        "category": "development",
+        "name": "GitHub",
+        "url": "https://github.com/",
+        "description": "全球最大的代码托管平台，开源项目的聚集地",
+        "tags": [
+          "代码",
+          "Git",
+          "开发"
+        ]
+      },
+      {
+        "id": "tools-Gitee",
+        "category": "development",
+        "name": "Gitee",
+        "url": "https://gitee.com/",
+        "description": "国内领先的代码托管平台，支持Git和SVN",
+        "tags": [
+          "代码",
+          "Git",
+          "开发"
         ]
       },
       {
@@ -489,29 +546,6 @@
         ]
       },
       {
-        "id": "tools-Gitee",
-        "category": "development",
-        "name": "Gitee",
-        "url": "https://gitee.com/",
-        "description": "国内领先的代码托管平台，支持Git和SVN",
-        "tags": [
-          "代码",
-          "Git",
-          "开发"
-        ]
-      },
-      {
-        "id": "tools-印象笔记",
-        "category": "productivity",
-        "name": "印象笔记",
-        "url": "https://www.yinxiang.com/",
-        "description": "印象笔记，专业的笔记和知识管理工具",
-        "tags": [
-          "笔记",
-          "知识库"
-        ]
-      },
-      {
         "id": "tools-flomo",
         "category": "productivity",
         "name": "flomo",
@@ -520,18 +554,6 @@
         "tags": [
           "笔记",
           "记录"
-        ]
-      },
-      {
-        "id": "tools-GitHub",
-        "category": "development",
-        "name": "GitHub",
-        "url": "https://github.com/",
-        "description": "全球最大的代码托管平台，开源项目的聚集地",
-        "tags": [
-          "代码",
-          "Git",
-          "开发"
         ]
       },
       {
@@ -544,28 +566,6 @@
           "设计",
           "原型",
           "协作"
-        ]
-      },
-      {
-        "id": "tools-Draw.io",
-        "category": "productivity",
-        "name": "Draw.io",
-        "url": "https://app.diagrams.net/",
-        "description": "免费的在线流程图和图表绘制工具",
-        "tags": [
-          "图表",
-          "流程图"
-        ]
-      },
-      {
-        "id": "tools-Excalidraw",
-        "category": "productivity",
-        "name": "Excalidraw",
-        "url": "https://excalidraw.com/",
-        "description": "简洁的手绘风格图表和白板工具",
-        "tags": [
-          "白板",
-          "图表"
         ]
       },
       {
@@ -674,6 +674,52 @@
         ]
       },
       {
+        "id": "social-X",
+        "category": "media",
+        "name": "X",
+        "url": "https://x.com/",
+        "description": "Twitter (X)，全球知名的社交媒体平台",
+        "tags": [
+          "社交",
+          "资讯",
+          "国际"
+        ]
+      },
+      {
+        "id": "social-Discord",
+        "category": "media",
+        "name": "Discord",
+        "url": "https://discord.com/",
+        "description": "Discord，全球知名的社群聊天与语音平台",
+        "tags": [
+          "社群",
+          "消息",
+          "语音"
+        ]
+      },
+      {
+        "id": "entertainment-YouTube",
+        "category": "media",
+        "name": "YouTube",
+        "url": "https://www.youtube.com/",
+        "description": "YouTube，全球最大的视频分享平台",
+        "tags": [
+          "视频",
+          "国际"
+        ]
+      },
+      {
+        "id": "social-微博",
+        "category": "media",
+        "name": "微博",
+        "url": "https://weibo.com/",
+        "description": "新浪微博，中国最大的社交媒体平台",
+        "tags": [
+          "社交",
+          "资讯"
+        ]
+      },
+      {
         "id": "entertainment-哔哩哔哩",
         "category": "media",
         "name": "哔哩哔哩",
@@ -749,28 +795,6 @@
         ]
       },
       {
-        "id": "entertainment-YouTube",
-        "category": "media",
-        "name": "YouTube",
-        "url": "https://www.youtube.com/",
-        "description": "YouTube，全球最大的视频分享平台",
-        "tags": [
-          "视频",
-          "国际"
-        ]
-      },
-      {
-        "id": "social-微博",
-        "category": "media",
-        "name": "微博",
-        "url": "https://weibo.com/",
-        "description": "新浪微博，中国最大的社交媒体平台",
-        "tags": [
-          "社交",
-          "资讯"
-        ]
-      },
-      {
         "id": "social-微信公众平台",
         "category": "media",
         "name": "微信公众平台",
@@ -835,30 +859,6 @@
         "tags": [
           "创作",
           "视频"
-        ]
-      },
-      {
-        "id": "social-X",
-        "category": "media",
-        "name": "X",
-        "url": "https://x.com/",
-        "description": "Twitter (X)，全球知名的社交媒体平台",
-        "tags": [
-          "社交",
-          "资讯",
-          "国际"
-        ]
-      },
-      {
-        "id": "social-Discord",
-        "category": "media",
-        "name": "Discord",
-        "url": "https://discord.com/",
-        "description": "Discord，全球知名的社群聊天与语音平台",
-        "tags": [
-          "社群",
-          "消息",
-          "语音"
         ]
       }
     ]
