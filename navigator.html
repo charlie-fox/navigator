@@ -1,1128 +1,868 @@
 <!doctype html>
 <html lang="zh-CN">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta
-            name="description"
-            content="个人网站导航，集成搜索、社交、AI工具、开发工具等常用网站链接"
-        />
-        <meta name="theme-color" content="#8b5cf6" />
-        <title>个人导航</title>
-        <style>
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }
-
-            body {
-                font-family:
-                    system-ui,
-                    -apple-system,
-                    "Segoe UI",
-                    "PingFang SC",
-                    "Microsoft YaHei",
-                    sans-serif;
-                font-display: swap;
-                background: linear-gradient(
-                    135deg,
-                    #4a5568 0%,
-                    #5a6c7d 50%,
-                    #4a5568 100%
-                );
-                background-attachment: fixed;
-                min-height: 100vh;
-                padding: 15px;
-                position: relative;
-                color: #2d3748;
-            }
-
-            body::before {
-                content: "";
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: radial-gradient(
-                    ellipse at center,
-                    rgba(52, 73, 94, 0.1) 0%,
-                    rgba(44, 62, 80, 0.05) 100%
-                );
-                pointer-events: none;
-                z-index: -1;
-            }
-
-            .search-bar {
-                max-width: 1800px;
-                margin: 0 auto 15px;
-                background: rgba(255, 255, 255, 0.95);
-                border-radius: 16px;
-                padding: 20px;
-                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-                border: 1px solid rgba(255, 255, 255, 0.3);
-                backdrop-filter: blur(10px);
-                display: flex;
-                align-items: center;
-                gap: 15px;
-            }
-
-            .search-bar input {
-                flex: 1;
-                padding: 12px 20px;
-                border: 2px solid rgba(139, 92, 246, 0.2);
-                border-radius: 25px;
-                font-size: 0.9em;
-                outline: none;
-                transition: all 0.3s ease;
-                background: rgba(255, 255, 255, 0.9);
-                color: #2d3748;
-            }
-
-            .search-bar input:focus {
-                border-color: #8b5cf6;
-                background: rgba(255, 255, 255, 1);
-                box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
-            }
-
-            .search-bar input::placeholder {
-                color: #a0aec0;
-            }
-
-            .search-engines {
-                display: flex;
-                gap: 10px;
-            }
-
-            .search-engines label {
-                display: flex;
-                align-items: center;
-                gap: 5px;
-                font-size: 0.85em;
-                color: #4a5568;
-                cursor: pointer;
-            }
-
-            .search-engines input[type="radio"] {
-                cursor: pointer;
-                accent-color: #8b5cf6;
-                width: 16px;
-                height: 16px;
-            }
-
-            .search-engines input[type="radio"]:checked {
-                background-color: #8b5cf6;
-                border-color: #8b5cf6;
-            }
-
-            .search-btn {
-                padding: 12px 30px;
-                background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-                color: white;
-                border: none;
-                border-radius: 25px;
-                font-size: 0.9em;
-                cursor: pointer;
-                transition: all 0.3s ease;
-                box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
-            }
-
-            .search-btn:hover {
-                background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
-                box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
-            }
-
-            .container {
-                max-width: 1800px;
-                margin: 0 auto;
-                display: flex;
-                gap: 15px;
-            }
-
-            .sidebar {
-                width: 200px;
-                flex-shrink: 0;
-            }
-
-            .main-content {
-                flex: 1;
-            }
-
-            .section {
-                background: rgba(255, 255, 255, 0.95);
-                border-radius: 16px;
-                padding: 20px;
-                margin-bottom: 20px;
-                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-                border: 1px solid rgba(255, 255, 255, 0.3);
-                backdrop-filter: blur(10px);
-                position: relative;
-                overflow: hidden;
-            }
-
-            .section-title {
-                font-size: 1.1em;
-                color: #2d3748;
-                margin-bottom: 16px;
-                padding-bottom: 10px;
-                border-bottom: 2px solid rgba(0, 0, 0, 0.1);
-                font-weight: 600;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            }
-
-            /* 分区标题颜色方案 */
-            .sidebar .section:nth-child(1) { --section-color: #1e40af; } /* 搜索 - 深蓝 */
-            .sidebar .section:nth-child(1) .section-title { color: #1e40af; }
-
-            .sidebar .section:nth-child(2) { --section-color: #047857; } /* 办公 - 深绿 */
-            .sidebar .section:nth-child(2) .section-title { color: #047857; }
-
-            .main-content .section:nth-child(1) { --section-color: #6d28d9; } /* AI - 深紫 */
-            .main-content .section:nth-child(1) .section-title { color: #6d28d9; }
-
-            .main-content .section:nth-child(2) { --section-color: #0369a1; } /* 云服务 - 天蓝 */
-            .main-content .section:nth-child(2) .section-title { color: #0369a1; }
-
-            .main-content .section:nth-child(3) { --section-color: #4338ca; } /* 工具 - 深蓝紫 */
-            .main-content .section:nth-child(3) .section-title { color: #4338ca; }
-
-            .main-content .section:nth-child(4) { --section-color: #be185d; } /* 生活 - 深粉 */
-            .main-content .section:nth-child(4) .section-title { color: #be185d; }
-
-            .main-content .section:nth-child(5) { --section-color: #dc2626; } /* 娱乐 - 深红 */
-            .main-content .section:nth-child(5) .section-title { color: #dc2626; }
-
-            .main-content .section:nth-child(6) { --section-color: #b45309; } /* 社交 - 深橙 */
-            .main-content .section:nth-child(6) .section-title { color: #b45309; }
-
-            .links-grid {
-                display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-                gap: 10px;
-            }
-
-            .sidebar .links-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .link-item {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                padding: 12px 16px;
-                background: rgba(248, 250, 252, 0.9);
-                border-radius: 10px;
-                text-decoration: none;
-                color: #374151;
-                font-size: 0.85em;
-                font-weight: 500;
-                transition: all 0.3s ease;
-                border: 1px solid rgba(0, 0, 0, 0.15);
-                position: relative;
-                overflow: hidden;
-                text-align: center;
-                line-height: 1.3;
-                min-height: 44px;
-            }
-
-            .link-item::before {
-                content: "";
-                position: absolute;
-                top: 0;
-                left: -100%;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(
-                    90deg,
-                    transparent,
-                    rgba(255, 255, 255, 0.4),
-                    transparent
-                );
-                transition: left 0.5s ease;
-            }
-
-            .link-item:hover::before {
-                left: 100%;
-            }
-
-            .link-item:hover {
-                background: rgba(255, 255, 255, 0.95);
-                color: var(--section-color, #8b5cf6);
-                transform: translateY(-1px);
-                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-                border-color: var(--section-color, #8b5cf6);
-            }
-
-            /* Tooltip样式 */
-            .tooltip {
-                position: fixed;
-                background: rgba(45, 55, 72, 0.95);
-                color: white;
-                padding: 12px 16px;
-                border-radius: 10px;
-                font-size: 0.8em;
-                z-index: 1000;
-                opacity: 0;
-                pointer-events: none;
-                display: none;
-                box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
-                max-width: 300px;
-                white-space: normal;
-                line-height: 1.5;
-                border: 1px solid rgba(255, 255, 255, 0.1);
-            }
-
-            .tooltip.show {
-                display: block !important;
-                opacity: 1 !important;
-            }
-
-            .tooltip::after {
-                content: "";
-                position: absolute;
-                top: 100%;
-                left: 50%;
-                transform: translateX(-50%);
-                border: 8px solid transparent;
-                border-top-color: rgba(45, 55, 72, 0.95);
-            }
-
-            /* 响应式设计和设备优化 */
-            @media (prefers-reduced-motion: reduce) {
-                * {
-                    animation-duration: 0.01ms !important;
-                    animation-iteration-count: 1 !important;
-                    transition-duration: 0.01ms !important;
-                }
-
-                .link-item::before {
-                    display: none;
-                }
-
-                .link-item:hover {
-                    transform: none;
-                }
-            }
-
-            @media (max-resolution: 150dpi) {
-                .search-bar,
-                .section {
-                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                }
-
-                .link-item {
-                    box-shadow: none;
-                    border: 1px solid #d1d5db;
-                }
-            }
-
-            @media (max-width: 1024px) {
-                .container {
-                    flex-direction: column;
-                }
-
-                .sidebar {
-                    width: 100%;
-                }
-
-                .sidebar .links-grid {
-                    grid-template-columns: repeat(
-                        auto-fill,
-                        minmax(100px, 1fr)
-                    );
-                }
-
-                .search-bar, .section, .tooltip {
-                    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-                }
-            }
-
-            @media (max-width: 480px), (pointer: coarse) and (max-device-width: 768px) {
-                body::before {
-                    display: none;
-                }
-
-                .link-item::before, .tooltip::after {
-                    display: none;
-                }
-
-                .search-bar, .section, .link-item {
-                    box-shadow: none;
-                    border: 1px solid #9ca3af;
-                }
-            }
-        </style>
-    </head>
-
-    <body>
-        <!-- 搜索栏 -->
-        <div class="search-bar">
-            <input type="text" id="searchInput" placeholder="输入关键词搜索...">
-            <div class="search-engines">
-                <label>
-                    <input type="radio" name="engine" value="bing" checked>
-                    Bing
-                </label>
-                <label>
-                    <input type="radio" name="engine" value="google">
-                    Google
-                </label>
-            </div>
-            <button class="search-btn" id="searchBtn">搜索</button>
-        </div>
-
-        <script>
-            function performSearch() {
-                const query = document
-                    .getElementById("searchInput")
-                    .value.trim();
-                if (!query) return;
-
-                const engine = document.querySelector('input[name="engine"]:checked').value;
-                const urls = {
-                    bing: 'https://www.bing.com/search?q=',
-                    google: 'https://www.google.com/search?q='
-                };
-
-                window.open(urls[engine] + encodeURIComponent(query), '_blank');
-            }
-
-            // 搜索事件监听
-            document.addEventListener('DOMContentLoaded', function () {
-                const searchInput = document.getElementById('searchInput');
-                const searchBtn = document.getElementById('searchBtn');
-
-                searchBtn.addEventListener('click', performSearch);
-                searchInput.addEventListener('keypress', function (e) {
-                    if (e.key === 'Enter') {
-                        performSearch();
-                    }
-                });
-            });
-
-            // Tooltip功能实现
-            document.addEventListener('DOMContentLoaded', function () {
-                const tooltip = document.createElement('div');
-                tooltip.className = 'tooltip';
-                document.body.appendChild(tooltip);
-
-                let currentTimer = null;
-
-                // 强制隐藏tooltip
-                function forceHideTooltip() {
-                    if (currentTimer) {
-                        clearTimeout(currentTimer);
-                        currentTimer = null;
-                    }
-
-                    tooltip.className = 'tooltip';
-                    tooltip.style.display = 'none';
-                    tooltip.style.visibility = 'hidden';
-                    tooltip.style.opacity = '0';
-                    tooltip.textContent = '';
-
-                    document.querySelectorAll('.link-item').forEach((item) => {
-                        const dataTitle = item.getAttribute('data-title');
-                        if (dataTitle) {
-                            item.setAttribute('title', dataTitle);
-                            item.removeAttribute('data-title');
-                        }
-                    });
-                }
-
-                function showTooltip(element) {
-                    forceHideTooltip();
-
-                    const title = element.getAttribute('title');
-                    if (!title) return;
-
-                    currentTimer = setTimeout(() => {
-                        tooltip.textContent = title;
-                        element.setAttribute('data-title', title);
-                        element.removeAttribute('title');
-
-                        tooltip.style.display = '';
-                        tooltip.style.visibility = '';
-                        tooltip.style.opacity = '';
-
-                        updateTooltipPosition(element);
-                        tooltip.className = 'tooltip show';
-                        currentTimer = null;
-                    }, 200);
-                }
-
-                // 为每个链接绑定事件
-                document.querySelectorAll(".link-item").forEach(function (item) {
-                        item.addEventListener("mouseenter", function () {
-                            showTooltip(this);
-                        });
-
-                        item.addEventListener("mouseleave", function () {
-                            forceHideTooltip();
-                        });
-                    });
-
-                // 全局事件监听
-                document.addEventListener("scroll", forceHideTooltip);
-                document.addEventListener("click", forceHideTooltip);
-                window.addEventListener("blur", forceHideTooltip);
-
-                // 位置更新函数
-                function updateTooltipPosition(element) {
-                    const buttonRect = element.getBoundingClientRect();
-                    const viewportWidth = window.innerWidth;
-                    const viewportHeight = window.innerHeight;
-
-                    // 临时显示tooltip以获取正确的尺寸
-                    tooltip.style.display = "block";
-                    tooltip.style.visibility = "hidden";
-                    tooltip.style.opacity = "0";
-
-                    const tooltipRect = tooltip.getBoundingClientRect();
-
-                    let left = buttonRect.left + buttonRect.width / 2 - tooltipRect.width / 2;
-                    let top = buttonRect.top - tooltipRect.height - 8;
-
-                    // 垂直位置边界检测
-                    if (top < 8) {
-                        // 上方空间不够，放到下方
-                        top = buttonRect.bottom + 8;
-                    }
-
-                    // 检查下方是否超出视口
-                    if (top + tooltipRect.height > viewportHeight - 8) {
-                        // 下方也不够，尝试放在元素中间偏上
-                        top = Math.max(
-                            8,
-                            buttonRect.top +
-                                buttonRect.height / 2 -
-                                tooltipRect.height / 2,
-                        );
-                    }
-
-                    // 水平位置边界检测
-                    if (left < 8) {
-                        left = 8;
-                    } else if (left + tooltipRect.width > viewportWidth - 8) {
-                        left = viewportWidth - tooltipRect.width - 8;
-                    }
-
-                    tooltip.style.left = left + 'px';
-                    tooltip.style.top = top + 'px';
-                    tooltip.style.visibility = 'visible';
-                    tooltip.style.opacity = '1';
-                }
-            });
-        </script>
-
-        <div class="container">
-            <!-- 左侧边栏 -->
-            <div class="sidebar">
-                <!-- 搜索 -->
-                <div class="section">
-                    <div class="section-title">🔍 搜索</div>
-                    <div class="links-grid">
-                        <a
-                            href="https://www.bing.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="微软推出的搜索引擎，提供网页搜索和每日精美壁纸"
-                            >必应</a
-                        >
-                        <a
-                            href="https://www.baidu.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="中国最大的搜索引擎，提供中文网页、图片、视频搜索"
-                            >百度</a
-                        >
-                        <a
-                            href="https://www.google.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="全球最大的搜索引擎，提供网页、图片、视频等搜索服务"
-                            >Google</a
-                        >
-                    </div>
-                </div>
-
-                <!-- 办公 -->
-                <div class="section">
-                    <div class="section-title">📧 办公</div>
-                    <div class="links-grid">
-                        <!-- 国产办公服务 -->
-                        <a
-                            href="https://www.wps.cn/"
-                            class="link-item"
-                            target="_blank"
-                            title="WPS Office，国产办公软件套件，支持文档、表格、演示文稿编辑"
-                            >WPS Office</a
-                        >
-                        <a
-                            href="https://www.feishu.cn/next/messenger"
-                            class="link-item"
-                            target="_blank"
-                            title="飞书，字节跳动推出的协作办公平台"
-                            >飞书</a
-                        >
-                        <a
-                            href="https://docs.qq.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="腾讯文档，在线文档编辑和协作平台"
-                            >腾讯文档</a
-                        >
-                        <a
-                            href="https://mail.qq.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="腾讯QQ邮箱，提供免费邮件收发服务"
-                            >QQ邮箱</a
-                        >
-                        <a
-                            href="https://mail.163.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="网易163邮箱，老牌免费邮箱服务"
-                            >163邮箱</a
-                        >
-
-                        <!-- 国际办公服务 -->
-                        <a
-                            href="https://www.office.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="Microsoft Office 365，微软办公软件套件，包含Word、Excel、PowerPoint等"
-                            >Office 365</a
-                        >
-                        <a
-                            href="https://mail.google.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="Google Gmail，功能强大的免费邮箱服务"
-                            >Gmail</a
-                        >
-                    </div>
-                </div>
-            </div>
-
-            <!-- 右侧主内容区 -->
-            <div class="main-content">
-                <!-- AI -->
-                <div class="section">
-                    <div class="section-title">🤖 AI</div>
-                    <div class="links-grid">
-                        <!-- 国际AI服务 -->
-                        <a
-                            href="https://chatgpt.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="OpenAI开发的AI聊天机器人，功能强大的对话AI"
-                            >ChatGPT</a
-                        >
-                        <a
-                            href="https://claude.ai/"
-                            class="link-item"
-                            target="_blank"
-                            title="Anthropic推出的AI助手，擅长长文本理解、写作和分析"
-                            >Claude</a
-                        >
-                        <a
-                            href="https://gemini.google.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="Google推出的多模态AI助手，支持文本、图像和代码"
-                            >Gemini</a
-                        >
-                        <a
-                            href="https://copilot.microsoft.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="微软AI助手，集成在Office和Windows中的智能助手"
-                            >Copilot</a
-                        >
-                        <a
-                            href="https://notebooklm.google/"
-                            class="link-item"
-                            target="_blank"
-                            title="Google推出的AI笔记本，智能整理和分析文档内容"
-                            >NotebookLM</a
-                        >
-                        <a
-                            href="https://aistudio.google.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="Google AI开发平台，构建和部署AI应用的工具"
-                            >Google AI Studio</a
-                        >
-                        <a
-                            href="https://labs.google/fx/tools/flow"
-                            class="link-item"
-                            target="_blank"
-                            title="Google实验室的Flow工具，AI驱动的创意工作流"
-                            >Google Flow</a
-                        >
-                        <a
-                            href="https://suno.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="AI音乐生成平台，通过文本描述创作原创音乐"
-                            >Suno</a
-                        >
-                        <a
-                            href="https://elevenlabs.io/"
-                            class="link-item"
-                            target="_blank"
-                            title="ElevenLabs AI语音合成平台，生成逼真的人工智能语音"
-                            >ElevenLabs</a
-                        >
-
-                        <!-- 国产AI服务 -->
-                        <a
-                            href="https://www.qianwen.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="阿里云推出的大语言模型，提供智能对话服务"
-                            >千问</a
-                        >
-                        <a
-                            href="https://kimi.moonshot.cn/"
-                            class="link-item"
-                            target="_blank"
-                            title="月之暗面推出的AI助手，擅长长文本理解和分析"
-                            >Kimi</a
-                        >
-                        <a
-                            href="https://www.doubao.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="字节跳动推出的AI聊天助手，支持多种对话场景"
-                            >豆包</a
-                        >
-                        <a
-                            href="https://www.deepseek.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="DeepSeek AI，专注于深度学习和推理的AI助手"
-                            >DeepSeek</a
-                        >
-                        <a
-                            href="https://manus.im/"
-                            class="link-item"
-                            target="_blank"
-                            title="Manus通用AI智能体，可自主规划并完成研究和任务执行"
-                            >Manus</a
-                        >
-                        <a
-                            href="https://ima.qq.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="腾讯IMA会思考的知识库，智能整理和分析知识内容"
-                            >腾讯IMA</a
-                        >
-                        <a
-                            href="https://klingai.kuaishou.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="快手推出的AI视频生成工具，轻松创作短视频内容"
-                            >可灵AI</a
-                        >
-                        <a
-                            href="https://jimeng.jianying.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="剪映推出的AI创意工具，智能生成视频和图像"
-                            >即梦AI</a
-                        >
-                        <a
-                            href="https://www.biji.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="AI驱动的智能笔记工具，帮助整理和管理知识"
-                            >得到大脑</a
-                        >
-                        <a
-                            href="https://chat.qwen.ai/"
-                            class="link-item"
-                            target="_blank"
-                            title="QWen Studio，通义千问AI对话平台"
-                            >QWen Studio</a
-                        >
-                        <a
-                            href="https://www.yourmusic.fun/"
-                            class="link-item"
-                            target="_blank"
-                            title="AI音乐创作平台，让每个人都能创作属于自己的音乐"
-                            >YourMusic</a
-                        >
-                    </div>
-                </div>
-
-                <!-- 云服务 -->
-                <div class="section">
-                    <div class="section-title">☁️ 云服务</div>
-                    <div class="links-grid">
-                        <!-- 国际云服务 -->
-                        <a
-                            href="https://www.oracle.com/cloud/"
-                            class="link-item"
-                            target="_blank"
-                            title="Oracle Cloud，甲骨文企业级云计算平台，提供基础设施和数据库云服务"
-                            >Oracle Cloud</a
-                        >
-                        <a
-                            href="https://www.cloudflare.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="CloudFlare，全球知名的CDN、网络安全和边缘计算服务平台"
-                            >CloudFlare</a
-                        >
-                    </div>
-                </div>
-
-                <!-- 工具 -->
-                <div class="section">
-                    <div class="section-title">🛠️ 工具</div>
-                    <div class="links-grid">
-                        <!-- 地图导航 -->
-                        <a
-                            href="https://ditu.amap.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="高德地图，提供精准的地图导航和位置服务"
-                            >高德地图</a
-                        >
-                        <a
-                            href="https://maps.google.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="谷歌地图，全球地图服务和导航工具"
-                            >谷歌地图</a
-                        >
-                        <a
-                            href="https://earth.google.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="谷歌地球，探索世界各地的卫星图像和3D地形"
-                            >谷歌地球</a
-                        >
-
-                        <!-- 云存储 -->
-                        <a
-                            href="https://www.weiyun.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="微云，腾讯推出的云存储服务，安全可靠的文件同步与分享"
-                            >微云</a
-                        >
-                        <a
-                            href="https://pan.baidu.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="百度网盘，提供大容量云存储和文件同步"
-                            >百度网盘</a
-                        >
-                        <a
-                            href="https://www.aliyundrive.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="阿里云盘，阿里巴巴推出的云存储服务"
-                            >阿里云盘</a
-                        >
-
-                        <!-- 开发设计 -->
-                        <a
-                            href="https://gitee.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="国内领先的代码托管平台，支持Git和SVN"
-                            >Gitee</a
-                        >
-                        <a
-                            href="https://www.yinxiang.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="印象笔记，专业的笔记和知识管理工具"
-                            >印象笔记</a
-                        >
-                        <a
-                            href="https://v.flomoapp.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="flomo 浮墨笔记，轻量级的灵感记录和知识管理工具"
-                            >flomo</a
-                        >
-                        <a
-                            href="https://github.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="全球最大的代码托管平台，开源项目的聚集地"
-                            >GitHub</a
-                        >
-                        <a
-                            href="https://www.figma.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="专业的UI/UX设计工具，支持团队协作"
-                            >Figma</a
-                        >
-                        <a
-                            href="https://www.canva.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="简单易用的图形设计平台，丰富的模板库"
-                            >Canva</a
-                        >
-                        <a
-                            href="https://app.diagrams.net/"
-                            class="link-item"
-                            target="_blank"
-                            title="免费的在线流程图和图表绘制工具"
-                            >Draw.io</a
-                        >
-                        <a
-                            href="https://excalidraw.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="简洁的手绘风格图表和白板工具"
-                            >Excalidraw</a
-                        >
-                        <a
-                            href="https://app.standardnotes.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="Standard Notes，注重隐私和安全的开源笔记应用"
-                            >Standard Notes</a
-                        >
-                        <a
-                            href="https://www.geogebra.org/"
-                            class="link-item"
-                            target="_blank"
-                            title="GeoGebra，免费的数学软件，支持几何、代数、统计和微积分"
-                            >GeoGebra</a
-                        >
-                    </div>
-                </div>
-
-                <!-- 生活 -->
-                <div class="section">
-                    <div class="section-title">🏠 生活</div>
-                    <div class="links-grid">
-                        <a
-                            href="https://www.taobao.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="阿里巴巴旗下购物网站，万能的网购平台"
-                            >淘宝</a
-                        >
-                        <a
-                            href="https://www.jd.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="京东商城，品质保证的综合电商平台"
-                            >京东</a
-                        >
-                        <a
-                            href="https://www.12306.cn/"
-                            class="link-item"
-                            target="_blank"
-                            title="中国铁路客户服务中心，火车票预订官网"
-                            >12306</a
-                        >
-                        <a
-                            href="https://www.ctrip.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="携程旅行网，一站式旅游服务平台"
-                            >携程</a
-                        >
-                        <a
-                            href="https://www.qunar.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="去哪儿网，旅游产品搜索和比价平台"
-                            >去哪儿</a
-                        >
-                        <a
-                            href="https://www.fliggy.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="阿里旅行·飞猪，年轻人的旅行平台"
-                            >飞猪</a
-                        >
-                        <a
-                            href="https://www.alipay.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="支付宝，数字生活开放平台"
-                            >支付宝</a
-                        >
-                        <a
-                            href="https://www.meituan.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="美团，生活服务电商平台"
-                            >美团</a
-                        >
-                        <a
-                            href="https://www.dianping.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="大众点评，本地生活信息及交易平台"
-                            >大众点评</a
-                        >
-                    </div>
-                </div>
-
-                <!-- 娱乐 -->
-                <div class="section">
-                    <div class="section-title">🎬 娱乐</div>
-                    <div class="links-grid">
-                        <!-- 国产娱乐平台 -->
-                        <a
-                            href="https://www.bilibili.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="哔哩哔哩，年轻人聚集的弹幕视频网站"
-                            >哔哩哔哩</a
-                        >
-                        <a
-                            href="https://www.douyin.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="抖音，记录美好生活的短视频平台"
-                            >抖音</a
-                        >
-                        <a
-                            href="https://v.qq.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="腾讯视频，不负好时光的视频平台"
-                            >腾讯视频</a
-                        >
-                        <a
-                            href="https://www.iqiyi.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="爱奇艺，悦享品质的视频娱乐平台"
-                            >爱奇艺</a
-                        >
-                        <a
-                            href="https://www.youku.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="优酷视频，这世界很酷的视频平台"
-                            >优酷</a
-                        >
-                        <a
-                            href="https://music.163.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="网易云音乐，音乐的力量的音乐平台"
-                            >网易云音乐</a
-                        >
-                        <a
-                            href="https://y.qq.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="QQ音乐，听我想听的音乐平台"
-                            >QQ音乐</a
-                        >
-                        <a
-                            href="https://www.kugou.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="酷狗音乐，就是歌多的数字音乐平台"
-                            >酷狗音乐</a
-                        >
-
-                        <!-- 国际娱乐平台 -->
-                        <a
-                            href="https://www.youtube.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="YouTube，全球最大的视频分享平台"
-                            >YouTube</a
-                        >
-                    </div>
-                </div>
-
-                <!-- 社交 -->
-                <div class="section">
-                    <div class="section-title">💬 社交</div>
-                    <div class="links-grid">
-                        <!-- 国产社交平台 -->
-                        <a
-                            href="https://weibo.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="新浪微博，中国最大的社交媒体平台"
-                            >微博</a
-                        >
-                        <a
-                            href="https://mp.weixin.qq.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="微信公众平台，微信官方的公众号管理后台"
-                            >微信公众平台</a
-                        >
-                        <a
-                            href="https://channels.weixin.qq.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="微信视频号，微信官方的短视频平台"
-                            >微信视频号</a
-                        >
-                        <a
-                            href="https://www.zhihu.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="知乎，中文互联网高质量的问答社区"
-                            >知乎</a
-                        >
-                        <a
-                            href="https://www.xiaohongshu.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="小红书，年轻人的生活方式平台和消费决策入口"
-                            >小红书</a
-                        >
-                        <a
-                            href="https://www.douban.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="豆瓣，文艺青年聚集的书影音评分平台"
-                            >豆瓣</a
-                        >
-                        <a
-                            href="https://creator.douyin.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="抖音创作者平台，抖音官方的内容创作管理后台"
-                            >抖音创作者平台</a
-                        >
-
-                        <!-- 国际社交平台 -->
-                        <a
-                            href="https://x.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="Twitter (X)，全球知名的社交媒体平台"
-                            >Twitter (X)</a
-                        >
-                        <a
-                            href="https://discord.com/"
-                            class="link-item"
-                            target="_blank"
-                            title="Discord，全球知名的社群聊天与语音平台"
-                            >Discord</a
-                        >
-                    </div>
-                </div>
-            </div>
-        </div>
-    </body>
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="可搜索、可收藏的个人服务导航"><meta name="theme-color" content="#5b4bdb">
+  <title>个人导航</title>
+  <style>
+    :root{--page:#f5f7fb;--surface:#fff;--ink:#1e293b;--muted:#64748b;--line:#dfe5ef;--brand:#5b4bdb;--soft:#eeecff;--radius:14px}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-width:320px;background:var(--page);color:var(--ink);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}button,input,select{font:inherit}button{cursor:pointer}.skip{position:absolute;top:-4rem;left:1rem;z-index:3;padding:.7rem 1rem;border-radius:0 0 8px 8px;background:var(--brand);color:#fff}.skip:focus{top:0}.header{color:#fff;background:linear-gradient(125deg,#332b86,#5b4bdb 57%,#7c6cff)}.header-in,.layout{width:min(1440px,calc(100% - 32px));margin:auto}.header-in{padding:34px 0 28px}.eyebrow{margin:0 0 5px;font-size:.8rem;font-weight:700;letter-spacing:.08em;opacity:.75}.header h1{margin:0;font-size:clamp(1.6rem,3vw,2.25rem)}.subtitle{margin:8px 0 20px;color:#e7e5ff}.search{display:flex;gap:10px;max-width:820px}.search-box{position:relative;flex:1}.search input{width:100%;padding:14px 42px 14px 16px;border:1px solid transparent;border-radius:10px;outline:0;color:var(--ink)}.search input:focus{border-color:#c4bfff;box-shadow:0 0 0 4px #ffffff3d}.search-box span{position:absolute;right:14px;top:12px;color:var(--muted);pointer-events:none}.engine{padding:0 12px;border:1px solid transparent;border-radius:10px;background:#fff;color:var(--ink)}.external{padding:0 17px;border:1px solid #ffffff80;border-radius:10px;color:#fff;background:transparent;white-space:nowrap}.external:hover{background:#ffffff1f}.layout{display:grid;grid-template-columns:224px minmax(0,1fr);gap:28px;padding:26px 0 48px}.sidebar{position:sticky;top:18px;align-self:start}.nav,.hint,.collection,.section{border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}.nav{padding:10px}.nav-title{display:block;padding:8px 10px;color:var(--muted);font-size:.78rem;font-weight:700}.nav-list{display:grid;gap:2px}.nav-list button{display:flex;gap:9px;align-items:center;width:100%;padding:10px;border:0;border-radius:8px;background:transparent;color:#3b4658;text-align:left}.nav-list button:hover,.nav-list button[aria-pressed=true]{background:var(--soft);color:var(--brand)}.nav-list small{margin-left:auto;color:inherit;opacity:.68}.hint{margin-top:14px;padding:14px;color:var(--muted);font-size:.82rem;line-height:1.55}.collections{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-bottom:22px}.collection{padding:16px}.collection[hidden],.section[hidden]{display:none}.head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:13px}.head h2{margin:0;font-size:1.08rem}.head p,.head span,.summary{margin:0;color:var(--muted);font-size:.82rem}.section{scroll-margin-top:18px;margin-bottom:18px;padding:20px}.section>.head{padding-bottom:13px;border-bottom:1px solid var(--line)}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}.compact{display:flex;flex-wrap:wrap;gap:8px}.compact .card{flex:1 1 130px;min-height:auto}.compact .card-link{padding:9px 10px}.compact .desc,.compact .tags{display:none}.card{position:relative;min-height:126px;border:1px solid var(--line);border-radius:11px;background:#fff;transition:transform .16s,border-color .16s,box-shadow .16s}.card:hover{transform:translateY(-2px);border-color:#aaa3f5;box-shadow:0 7px 18px #302a7a1c}.card-link{display:flex;flex-direction:column;align-items:flex-start;min-height:124px;height:100%;padding:15px;color:var(--ink);text-decoration:none}.card-link:focus-visible,.favorite:focus-visible,button:focus-visible{outline:3px solid #8c83ee;outline-offset:2px}.name{padding-right:22px;font-weight:700;line-height:1.35}.desc{margin:7px 0 10px;color:var(--muted);font-size:.78rem;line-height:1.45}.tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:auto}.tag{padding:3px 7px;border-radius:999px;background:#f0efff;color:#5148ab;font-size:.69rem}.favorite{position:absolute;top:9px;right:9px;width:28px;height:28px;padding:0;border:0;border-radius:50%;background:transparent;color:#8b94a5;font-size:1.05rem;opacity:0}.card:hover .favorite,.favorite[aria-pressed=true]{opacity:1}.favorite[aria-pressed=true]{color:#dc8b00}.empty{display:none;padding:38px 20px;border:1px dashed #b9c4d2;border-radius:var(--radius);color:var(--muted);background:#fff;text-align:center}.empty.show{display:block}.summary{min-height:20px;margin:0 0 13px}@media(max-width:820px){.header-in,.layout{width:min(100% - 24px,1440px)}.layout{display:block;padding-top:16px}.sidebar{position:static;margin-bottom:16px}.nav{overflow-x:auto}.nav-list{display:flex;min-width:max-content}.nav-list button{width:auto}.hint{display:none}.collections{grid-template-columns:1fr}}@media(max-width:520px){.header-in{padding:26px 0 22px}.search{flex-direction:column}.engine,.external{min-height:42px}.section{padding:15px}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.card{min-height:118px}.card-link{min-height:116px;padding:12px}.desc{font-size:.73rem}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition-duration:.01ms!important}}
+    /* 紧凑标题栏与内容卡片。 */
+    .header-in{display:flex;align-items:center;gap:22px;padding:12px 0}.header h1{flex:none;font-size:1.42rem;white-space:nowrap}.search{flex:1;max-width:none}.search input{padding:11px 42px 11px 14px}.search-box span{top:9px}.external{min-height:40px}.layout{padding-top:18px}.collections{margin-bottom:12px}.summary:empty{display:none}.section{margin-bottom:12px;padding:16px}.section>.head{padding-bottom:10px}.card{min-height:110px}.card-link{min-height:108px;padding:13px}#recentBox{grid-column:1/-1;padding:16px}#recentBox .head{justify-content:space-between;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--line)}#recent{display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:12px}#recent .card{min-height:0}#recent .card-link{display:block;min-height:0;padding:10px 12px;text-align:center}#recent .name{padding:0;font-size:.86rem;font-weight:500}#recent .favorite{display:none}
+    @media(max-width:700px){.header-in{align-items:stretch;flex-direction:column;gap:9px;padding:11px 0}.search{flex-direction:row;flex-wrap:wrap}.search-box{flex-basis:100%}.external{flex:1}.section{padding:13px}.card{min-height:104px}.card-link{min-height:102px;padding:11px}}
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">跳到主要内容</a>
+  <header class="header"><div class="header-in"><h1>个人导航</h1><form class="search" id="searchForm" role="search"><div class="search-box"><input id="searchInput" type="search" autocomplete="off" placeholder="搜索服务、用途或标签，例如：网盘、视频、代码" aria-label="搜索站内服务"><span aria-hidden="true">⌕</span></div><button class="external" type="submit" data-engine="bing">Bing 搜索 ↗</button><button class="external" type="submit" data-engine="google">Google 搜索 ↗</button></form></div></header>
+  <div class="layout"><aside class="sidebar" aria-label="服务分类"><nav class="nav"><span class="nav-title">服务分类</span><div class="nav-list" id="categoryNav"></div></nav><p class="hint">输入关键词会搜索服务名、简介和标签。点击 ☆ 可将服务固定到“收藏”。</p></aside><main id="main" tabindex="-1"><div class="collections"><section class="collection" id="favoritesBox" hidden><div class="head"><h2>★ 收藏</h2><span>你的常用入口</span></div><div class="compact" id="favorites"></div></section><section class="collection" id="recentBox" hidden><div class="head"><h2>🕘 最近访问</h2><span>仅保存在此浏览器</span></div><div class="compact" id="recent"></div></section></div><p class="summary" id="summary" aria-live="polite"></p><div id="sections"></div><div class="empty" id="empty">没有找到匹配服务。试试更宽泛的词，或清空搜索。</div></main></div>
+  <script>
+    function initNavigator(data){
+    const {categories,services}=data;
+    const RECENT_LIMIT=12;
+    const load=key=>{try{return JSON.parse(localStorage.getItem(key))||[]}catch{return[]}},save=(key,value)=>localStorage.setItem(key,JSON.stringify(value));
+    const state={category:'all',query:'',favorites:load('navigator-favorites'),recent:load('navigator-recent')},byId=new Map(services.map(s=>[s.id,s]));
+    const $=s=>document.querySelector(s),esc=s=>s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+    const match=s=>!state.query||[s.name,s.description,...s.tags].join(' ').toLowerCase().includes(state.query.toLowerCase());
+    function card(s,compact=false){const liked=state.favorites.includes(s.id);return `<article class="card" data-id="${s.id}"><a class="card-link" href="${s.url}" target="_blank" rel="noopener noreferrer" aria-label="打开 ${esc(s.name)}（新窗口）"><span class="name">${esc(s.name)}</span><span class="desc">${esc(s.description)}</span><span class="tags">${s.tags.slice(0,compact?1:3).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</span></a><button class="favorite" type="button" data-favorite="${s.id}" aria-label="${liked?'取消收藏':'收藏'} ${esc(s.name)}" aria-pressed="${liked}">${liked?'★':'☆'}</button></article>`}
+    function renderNav(){const all=[{id:'all',icon:'◈',name:'全部服务',count:services.length},...categories.map(c=>({...c,count:services.filter(s=>s.category===c.id).length}))];$('#categoryNav').innerHTML=all.map(c=>`<button type="button" data-category="${c.id}" aria-pressed="${state.category===c.id}"><span>${c.icon} ${c.name}</span><small>${c.count}</small></button>`).join('')}
+    function collection(ids,grid,box){const items=ids.map(id=>byId.get(id)).filter(Boolean);box.hidden=!items.length;grid.innerHTML=items.map(s=>card(s,true)).join('')}
+    function render(){renderNav();collection(state.favorites,$('#favorites'),$('#favoritesBox'));collection(state.recent,$('#recent'),$('#recentBox'));let count=0;$('#sections').innerHTML=categories.map(c=>{const items=services.filter(s=>s.category===c.id&&match(s)),selected=state.category==='all'||state.category===c.id;if(selected)count+=items.length;return `<section class="section" id="category-${c.id}" ${!selected||!items.length?'hidden':''}><div class="head"><h2>${c.icon} ${c.name}</h2><p>${c.description} · ${items.length} 项</p></div><div class="grid">${items.map(s=>card(s)).join('')}</div></section>`}).join('');const filtered=state.query||state.category!=='all';$('#summary').textContent=filtered?`找到 ${count} 项服务${state.query?`，匹配“${state.query}”`:''}`:'';$('#empty').classList.toggle('show',count===0)}
+    $('#categoryNav').addEventListener('click',e=>{const b=e.target.closest('[data-category]');if(!b)return;state.category=b.dataset.category;render();$(state.category==='all'?'#main':`#category-${state.category}`)?.scrollIntoView({behavior:'smooth',block:'start'})});
+    document.addEventListener('click',e=>{const f=e.target.closest('[data-favorite]');if(f){e.preventDefault();e.stopPropagation();const id=f.dataset.favorite;state.favorites=state.favorites.includes(id)?state.favorites.filter(x=>x!==id):[id,...state.favorites];save('navigator-favorites',state.favorites);render();return}const link=e.target.closest('.card[data-id]');if(link){state.recent=[link.dataset.id,...state.recent.filter(x=>x!==link.dataset.id)].slice(0,RECENT_LIMIT);save('navigator-recent',state.recent)}});
+    $('#searchInput').addEventListener('input',e=>{state.query=e.target.value.trim();render()});$('#searchForm').addEventListener('submit',e=>{e.preventDefault();const q=$('#searchInput').value.trim(),base=e.submitter?.dataset.engine==='google'?'https://www.google.com/search?q=':'https://www.bing.com/search?q=';if(q)window.open(base+encodeURIComponent(q),'_blank','noopener')});render();
+    }
+    document.addEventListener('DOMContentLoaded',()=>initNavigator(JSON.parse(document.querySelector('#navigator-data').textContent)));
+  </script>
+  <!-- 可维护数据区：新增、删除或调整服务时，优先编辑这里。 -->
+  <script type="application/json" id="navigator-data">
+  {
+    "categories": [
+      {
+        "id": "search",
+        "icon": "🔍",
+        "name": "搜索",
+        "description": "常用网页搜索引擎"
+      },
+      {
+        "id": "ai",
+        "icon": "🤖",
+        "name": "AI",
+        "description": "对话、研究与生成式创作"
+      },
+      {
+        "id": "productivity",
+        "icon": "✍️",
+        "name": "办公与创作",
+        "description": "文档、笔记、设计与学习"
+      },
+      {
+        "id": "development",
+        "icon": "⌨️",
+        "name": "开发与云",
+        "description": "代码托管、云计算与网络"
+      },
+      {
+        "id": "life",
+        "icon": "🧭",
+        "name": "生活与出行",
+        "description": "购物、地图、存储与本地服务"
+      },
+      {
+        "id": "media",
+        "icon": "▶️",
+        "name": "内容与社区",
+        "description": "影音娱乐、社交与内容发布"
+      }
+    ],
+    "services": [
+      {
+        "id": "search-必应",
+        "category": "search",
+        "name": "必应",
+        "url": "https://www.bing.com/",
+        "description": "微软推出的搜索引擎，提供网页搜索和每日精美壁纸",
+        "tags": [
+          "搜索",
+          "中文",
+          "国际"
+        ]
+      },
+      {
+        "id": "search-百度",
+        "category": "search",
+        "name": "百度",
+        "url": "https://www.baidu.com/",
+        "description": "中国最大的搜索引擎，提供中文网页、图片、视频搜索",
+        "tags": [
+          "搜索",
+          "中文"
+        ]
+      },
+      {
+        "id": "search-Google",
+        "category": "search",
+        "name": "Google",
+        "url": "https://www.google.com/",
+        "description": "全球最大的搜索引擎，提供网页、图片、视频等搜索服务",
+        "tags": [
+          "搜索",
+          "国际"
+        ]
+      },
+      {
+        "id": "work-WPS Office",
+        "category": "productivity",
+        "name": "WPS Office",
+        "url": "https://www.wps.cn/",
+        "description": "WPS Office，国产办公软件套件，支持文档、表格、演示文稿编辑",
+        "tags": [
+          "文档",
+          "表格",
+          "办公"
+        ]
+      },
+      {
+        "id": "work-飞书",
+        "category": "productivity",
+        "name": "飞书",
+        "url": "https://www.feishu.cn/next/messenger",
+        "description": "飞书，字节跳动推出的协作办公平台",
+        "tags": [
+          "协作",
+          "消息",
+          "办公"
+        ]
+      },
+      {
+        "id": "work-腾讯文档",
+        "category": "productivity",
+        "name": "腾讯文档",
+        "url": "https://docs.qq.com/",
+        "description": "腾讯文档，在线文档编辑和协作平台",
+        "tags": [
+          "文档",
+          "协作"
+        ]
+      },
+      {
+        "id": "work-QQ邮箱",
+        "category": "productivity",
+        "name": "QQ邮箱",
+        "url": "https://mail.qq.com/",
+        "description": "腾讯QQ邮箱，提供免费邮件收发服务",
+        "tags": [
+          "邮箱",
+          "邮件"
+        ]
+      },
+      {
+        "id": "work-163邮箱",
+        "category": "productivity",
+        "name": "163邮箱",
+        "url": "https://mail.163.com/",
+        "description": "网易163邮箱，老牌免费邮箱服务",
+        "tags": [
+          "邮箱",
+          "邮件"
+        ]
+      },
+      {
+        "id": "work-Microsoft 365",
+        "category": "productivity",
+        "name": "Microsoft 365",
+        "url": "https://www.office.com/",
+        "description": "Microsoft Office 365，微软办公软件套件，包含Word、Excel、PowerPoint等",
+        "tags": [
+          "文档",
+          "表格",
+          "办公"
+        ]
+      },
+      {
+        "id": "work-Gmail",
+        "category": "productivity",
+        "name": "Gmail",
+        "url": "https://mail.google.com/",
+        "description": "Google Gmail，功能强大的免费邮箱服务",
+        "tags": [
+          "邮箱",
+          "邮件"
+        ]
+      },
+      {
+        "id": "ai-ChatGPT",
+        "category": "ai",
+        "name": "ChatGPT",
+        "url": "https://chatgpt.com/",
+        "description": "OpenAI开发的AI聊天机器人，功能强大的对话AI",
+        "tags": [
+          "对话",
+          "写作",
+          "代码"
+        ]
+      },
+      {
+        "id": "ai-Claude",
+        "category": "ai",
+        "name": "Claude",
+        "url": "https://claude.ai/",
+        "description": "Anthropic推出的AI助手，擅长长文本理解、写作和分析",
+        "tags": [
+          "对话",
+          "写作",
+          "分析"
+        ]
+      },
+      {
+        "id": "ai-Gemini",
+        "category": "ai",
+        "name": "Gemini",
+        "url": "https://gemini.google.com/",
+        "description": "Google推出的多模态AI助手，支持文本、图像和代码",
+        "tags": [
+          "对话",
+          "多模态",
+          "代码"
+        ]
+      },
+      {
+        "id": "ai-Copilot",
+        "category": "ai",
+        "name": "Copilot",
+        "url": "https://copilot.microsoft.com/",
+        "description": "微软AI助手，集成在Office和Windows中的智能助手",
+        "tags": [
+          "对话",
+          "办公",
+          "代码"
+        ]
+      },
+      {
+        "id": "ai-NotebookLM",
+        "category": "ai",
+        "name": "NotebookLM",
+        "url": "https://notebooklm.google/",
+        "description": "Google推出的AI笔记本，智能整理和分析文档内容",
+        "tags": [
+          "研究",
+          "笔记",
+          "文档"
+        ]
+      },
+      {
+        "id": "ai-Google AI Studio",
+        "category": "ai",
+        "name": "Google AI Studio",
+        "url": "https://aistudio.google.com/",
+        "description": "Google AI开发平台，构建和部署AI应用的工具",
+        "tags": [
+          "开发",
+          "模型"
+        ]
+      },
+      {
+        "id": "ai-Suno",
+        "category": "ai",
+        "name": "Suno",
+        "url": "https://suno.com/",
+        "description": "AI音乐生成平台，通过文本描述创作原创音乐",
+        "tags": [
+          "音乐",
+          "生成"
+        ]
+      },
+      {
+        "id": "ai-ElevenLabs",
+        "category": "ai",
+        "name": "ElevenLabs",
+        "url": "https://elevenlabs.io/",
+        "description": "ElevenLabs AI语音合成平台，生成逼真的人工智能语音",
+        "tags": [
+          "语音",
+          "生成"
+        ]
+      },
+      {
+        "id": "ai-千问",
+        "category": "ai",
+        "name": "千问",
+        "url": "https://www.qianwen.com/",
+        "description": "阿里云推出的大语言模型，提供智能对话服务",
+        "tags": [
+          "对话",
+          "中文"
+        ]
+      },
+      {
+        "id": "ai-Kimi",
+        "category": "ai",
+        "name": "Kimi",
+        "url": "https://kimi.moonshot.cn/",
+        "description": "月之暗面推出的AI助手，擅长长文本理解和分析",
+        "tags": [
+          "对话",
+          "阅读",
+          "分析"
+        ]
+      },
+      {
+        "id": "ai-豆包",
+        "category": "ai",
+        "name": "豆包",
+        "url": "https://www.doubao.com/",
+        "description": "字节跳动推出的AI聊天助手，支持多种对话场景",
+        "tags": [
+          "对话",
+          "中文"
+        ]
+      },
+      {
+        "id": "ai-DeepSeek",
+        "category": "ai",
+        "name": "DeepSeek",
+        "url": "https://www.deepseek.com/",
+        "description": "DeepSeek AI，专注于深度学习和推理的AI助手",
+        "tags": [
+          "推理",
+          "代码"
+        ]
+      },
+      {
+        "id": "ai-Manus",
+        "category": "ai",
+        "name": "Manus",
+        "url": "https://manus.im/",
+        "description": "Manus通用AI智能体，可自主规划并完成研究和任务执行",
+        "tags": [
+          "智能体",
+          "研究"
+        ]
+      },
+      {
+        "id": "ai-腾讯IMA",
+        "category": "ai",
+        "name": "腾讯IMA",
+        "url": "https://ima.qq.com/",
+        "description": "腾讯IMA会思考的知识库，智能整理和分析知识内容",
+        "tags": [
+          "知识库",
+          "笔记"
+        ]
+      },
+      {
+        "id": "ai-可灵AI",
+        "category": "ai",
+        "name": "可灵AI",
+        "url": "https://klingai.kuaishou.com/",
+        "description": "快手推出的AI视频生成工具，轻松创作短视频内容",
+        "tags": [
+          "视频",
+          "生成"
+        ]
+      },
+      {
+        "id": "ai-即梦AI",
+        "category": "ai",
+        "name": "即梦AI",
+        "url": "https://jimeng.jianying.com/",
+        "description": "剪映推出的AI创意工具，智能生成视频和图像",
+        "tags": [
+          "图像",
+          "视频",
+          "生成"
+        ]
+      },
+      {
+        "id": "ai-得到大脑",
+        "category": "ai",
+        "name": "得到大脑",
+        "url": "https://www.biji.com/",
+        "description": "AI驱动的智能笔记工具，帮助整理和管理知识",
+        "tags": [
+          "笔记",
+          "知识库"
+        ]
+      },
+      {
+        "id": "ai-YourMusic",
+        "category": "ai",
+        "name": "YourMusic",
+        "url": "https://www.yourmusic.fun/",
+        "description": "AI音乐创作平台，让每个人都能创作属于自己的音乐",
+        "tags": [
+          "音乐",
+          "生成"
+        ]
+      },
+      {
+        "id": "cloud-Oracle Cloud",
+        "category": "development",
+        "name": "Oracle Cloud",
+        "url": "https://www.oracle.com/cloud/",
+        "description": "Oracle Cloud，甲骨文企业级云计算平台，提供基础设施和数据库云服务",
+        "tags": [
+          "云计算",
+          "数据库"
+        ]
+      },
+      {
+        "id": "cloud-Cloudflare",
+        "category": "development",
+        "name": "Cloudflare",
+        "url": "https://www.cloudflare.com/",
+        "description": "CloudFlare，全球知名的CDN、网络安全和边缘计算服务平台",
+        "tags": [
+          "网络",
+          "安全",
+          "CDN"
+        ]
+      },
+      {
+        "id": "tools-高德地图",
+        "category": "life",
+        "name": "高德地图",
+        "url": "https://ditu.amap.com/",
+        "description": "高德地图，提供精准的地图导航和位置服务",
+        "tags": [
+          "地图",
+          "导航",
+          "出行"
+        ]
+      },
+      {
+        "id": "tools-Google 地图",
+        "category": "life",
+        "name": "Google 地图",
+        "url": "https://maps.google.com/",
+        "description": "谷歌地图，全球地图服务和导航工具",
+        "tags": [
+          "地图",
+          "导航",
+          "出行"
+        ]
+      },
+      {
+        "id": "tools-Google 地球",
+        "category": "life",
+        "name": "Google 地球",
+        "url": "https://earth.google.com/",
+        "description": "谷歌地球，探索世界各地的卫星图像和3D地形",
+        "tags": [
+          "地图",
+          "地理"
+        ]
+      },
+      {
+        "id": "tools-微云",
+        "category": "life",
+        "name": "微云",
+        "url": "https://www.weiyun.com/",
+        "description": "微云，腾讯推出的云存储服务，安全可靠的文件同步与分享",
+        "tags": [
+          "网盘",
+          "云盘",
+          "存储"
+        ]
+      },
+      {
+        "id": "tools-百度网盘",
+        "category": "life",
+        "name": "百度网盘",
+        "url": "https://pan.baidu.com/",
+        "description": "百度网盘，提供大容量云存储和文件同步",
+        "tags": [
+          "网盘",
+          "云盘",
+          "存储"
+        ]
+      },
+      {
+        "id": "tools-阿里云盘",
+        "category": "life",
+        "name": "阿里云盘",
+        "url": "https://www.aliyundrive.com/",
+        "description": "阿里云盘，阿里巴巴推出的云存储服务",
+        "tags": [
+          "网盘",
+          "云盘",
+          "存储"
+        ]
+      },
+      {
+        "id": "tools-Gitee",
+        "category": "development",
+        "name": "Gitee",
+        "url": "https://gitee.com/",
+        "description": "国内领先的代码托管平台，支持Git和SVN",
+        "tags": [
+          "代码",
+          "Git",
+          "开发"
+        ]
+      },
+      {
+        "id": "tools-印象笔记",
+        "category": "productivity",
+        "name": "印象笔记",
+        "url": "https://www.yinxiang.com/",
+        "description": "印象笔记，专业的笔记和知识管理工具",
+        "tags": [
+          "笔记",
+          "知识库"
+        ]
+      },
+      {
+        "id": "tools-flomo",
+        "category": "productivity",
+        "name": "flomo",
+        "url": "https://v.flomoapp.com/",
+        "description": "flomo 浮墨笔记，轻量级的灵感记录和知识管理工具",
+        "tags": [
+          "笔记",
+          "记录"
+        ]
+      },
+      {
+        "id": "tools-GitHub",
+        "category": "development",
+        "name": "GitHub",
+        "url": "https://github.com/",
+        "description": "全球最大的代码托管平台，开源项目的聚集地",
+        "tags": [
+          "代码",
+          "Git",
+          "开发"
+        ]
+      },
+      {
+        "id": "tools-Figma",
+        "category": "productivity",
+        "name": "Figma",
+        "url": "https://www.figma.com/",
+        "description": "专业的UI/UX设计工具，支持团队协作",
+        "tags": [
+          "设计",
+          "原型",
+          "协作"
+        ]
+      },
+      {
+        "id": "tools-Draw.io",
+        "category": "productivity",
+        "name": "Draw.io",
+        "url": "https://app.diagrams.net/",
+        "description": "免费的在线流程图和图表绘制工具",
+        "tags": [
+          "图表",
+          "流程图"
+        ]
+      },
+      {
+        "id": "tools-Excalidraw",
+        "category": "productivity",
+        "name": "Excalidraw",
+        "url": "https://excalidraw.com/",
+        "description": "简洁的手绘风格图表和白板工具",
+        "tags": [
+          "白板",
+          "图表"
+        ]
+      },
+      {
+        "id": "life-淘宝",
+        "category": "life",
+        "name": "淘宝",
+        "url": "https://www.taobao.com/",
+        "description": "阿里巴巴旗下购物网站，万能的网购平台",
+        "tags": [
+          "购物",
+          "电商"
+        ]
+      },
+      {
+        "id": "life-京东",
+        "category": "life",
+        "name": "京东",
+        "url": "https://www.jd.com/",
+        "description": "京东商城，品质保证的综合电商平台",
+        "tags": [
+          "购物",
+          "电商"
+        ]
+      },
+      {
+        "id": "life-12306",
+        "category": "life",
+        "name": "12306",
+        "url": "https://www.12306.cn/",
+        "description": "中国铁路客户服务中心，火车票预订官网",
+        "tags": [
+          "火车",
+          "车票",
+          "出行"
+        ]
+      },
+      {
+        "id": "life-携程",
+        "category": "life",
+        "name": "携程",
+        "url": "https://www.ctrip.com/",
+        "description": "携程旅行网，一站式旅游服务平台",
+        "tags": [
+          "旅行",
+          "酒店",
+          "机票"
+        ]
+      },
+      {
+        "id": "life-去哪儿",
+        "category": "life",
+        "name": "去哪儿",
+        "url": "https://www.qunar.com/",
+        "description": "去哪儿网，旅游产品搜索和比价平台",
+        "tags": [
+          "旅行",
+          "酒店",
+          "机票"
+        ]
+      },
+      {
+        "id": "life-飞猪",
+        "category": "life",
+        "name": "飞猪",
+        "url": "https://www.fliggy.com/",
+        "description": "阿里旅行·飞猪，年轻人的旅行平台",
+        "tags": [
+          "旅行",
+          "酒店",
+          "机票"
+        ]
+      },
+      {
+        "id": "life-支付宝",
+        "category": "life",
+        "name": "支付宝",
+        "url": "https://www.alipay.com/",
+        "description": "支付宝，数字生活开放平台",
+        "tags": [
+          "支付",
+          "生活"
+        ]
+      },
+      {
+        "id": "life-美团",
+        "category": "life",
+        "name": "美团",
+        "url": "https://www.meituan.com/",
+        "description": "美团，生活服务电商平台",
+        "tags": [
+          "本地",
+          "外卖",
+          "生活"
+        ]
+      },
+      {
+        "id": "life-大众点评",
+        "category": "life",
+        "name": "大众点评",
+        "url": "https://www.dianping.com/",
+        "description": "大众点评，本地生活信息及交易平台",
+        "tags": [
+          "本地",
+          "美食",
+          "评价"
+        ]
+      },
+      {
+        "id": "entertainment-哔哩哔哩",
+        "category": "media",
+        "name": "哔哩哔哩",
+        "url": "https://www.bilibili.com/",
+        "description": "哔哩哔哩，年轻人聚集的弹幕视频网站",
+        "tags": [
+          "视频",
+          "社区"
+        ]
+      },
+      {
+        "id": "entertainment-抖音",
+        "category": "media",
+        "name": "抖音",
+        "url": "https://www.douyin.com/",
+        "description": "抖音，记录美好生活的短视频平台",
+        "tags": [
+          "短视频",
+          "视频"
+        ]
+      },
+      {
+        "id": "entertainment-腾讯视频",
+        "category": "media",
+        "name": "腾讯视频",
+        "url": "https://v.qq.com/",
+        "description": "腾讯视频，不负好时光的视频平台",
+        "tags": [
+          "视频",
+          "影视"
+        ]
+      },
+      {
+        "id": "entertainment-爱奇艺",
+        "category": "media",
+        "name": "爱奇艺",
+        "url": "https://www.iqiyi.com/",
+        "description": "爱奇艺，悦享品质的视频娱乐平台",
+        "tags": [
+          "视频",
+          "影视"
+        ]
+      },
+      {
+        "id": "entertainment-优酷",
+        "category": "media",
+        "name": "优酷",
+        "url": "https://www.youku.com/",
+        "description": "优酷视频，这世界很酷的视频平台",
+        "tags": [
+          "视频",
+          "影视"
+        ]
+      },
+      {
+        "id": "entertainment-网易云音乐",
+        "category": "media",
+        "name": "网易云音乐",
+        "url": "https://music.163.com/",
+        "description": "网易云音乐，音乐的力量的音乐平台",
+        "tags": [
+          "音乐"
+        ]
+      },
+      {
+        "id": "entertainment-QQ音乐",
+        "category": "media",
+        "name": "QQ音乐",
+        "url": "https://y.qq.com/",
+        "description": "QQ音乐，听我想听的音乐平台",
+        "tags": [
+          "音乐"
+        ]
+      },
+      {
+        "id": "entertainment-YouTube",
+        "category": "media",
+        "name": "YouTube",
+        "url": "https://www.youtube.com/",
+        "description": "YouTube，全球最大的视频分享平台",
+        "tags": [
+          "视频",
+          "国际"
+        ]
+      },
+      {
+        "id": "social-微博",
+        "category": "media",
+        "name": "微博",
+        "url": "https://weibo.com/",
+        "description": "新浪微博，中国最大的社交媒体平台",
+        "tags": [
+          "社交",
+          "资讯"
+        ]
+      },
+      {
+        "id": "social-微信公众平台",
+        "category": "media",
+        "name": "微信公众平台",
+        "url": "https://mp.weixin.qq.com/",
+        "description": "微信公众平台，微信官方的公众号管理后台",
+        "tags": [
+          "公众号",
+          "创作"
+        ]
+      },
+      {
+        "id": "social-微信视频号",
+        "category": "media",
+        "name": "微信视频号",
+        "url": "https://channels.weixin.qq.com/",
+        "description": "微信视频号，微信官方的短视频平台",
+        "tags": [
+          "短视频",
+          "视频",
+          "创作"
+        ]
+      },
+      {
+        "id": "social-知乎",
+        "category": "media",
+        "name": "知乎",
+        "url": "https://www.zhihu.com/",
+        "description": "知乎，中文互联网高质量的问答社区",
+        "tags": [
+          "社区",
+          "问答"
+        ]
+      },
+      {
+        "id": "social-小红书",
+        "category": "media",
+        "name": "小红书",
+        "url": "https://www.xiaohongshu.com/",
+        "description": "小红书，年轻人的生活方式平台和消费决策入口",
+        "tags": [
+          "社区",
+          "生活"
+        ]
+      },
+      {
+        "id": "social-豆瓣",
+        "category": "media",
+        "name": "豆瓣",
+        "url": "https://www.douban.com/",
+        "description": "豆瓣，文艺青年聚集的书影音评分平台",
+        "tags": [
+          "社区",
+          "书影音"
+        ]
+      },
+      {
+        "id": "social-抖音创作者平台",
+        "category": "media",
+        "name": "抖音创作者平台",
+        "url": "https://creator.douyin.com/",
+        "description": "抖音创作者平台，抖音官方的内容创作管理后台",
+        "tags": [
+          "创作",
+          "视频"
+        ]
+      },
+      {
+        "id": "social-X",
+        "category": "media",
+        "name": "X",
+        "url": "https://x.com/",
+        "description": "Twitter (X)，全球知名的社交媒体平台",
+        "tags": [
+          "社交",
+          "资讯",
+          "国际"
+        ]
+      },
+      {
+        "id": "social-Discord",
+        "category": "media",
+        "name": "Discord",
+        "url": "https://discord.com/",
+        "description": "Discord，全球知名的社群聊天与语音平台",
+        "tags": [
+          "社群",
+          "消息",
+          "语音"
+        ]
+      }
+    ]
+  }
+  </script>
+</body>
 </html>
