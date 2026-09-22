@@ -24,7 +24,7 @@
     const $=s=>document.querySelector(s),esc=s=>s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
     const match=s=>!state.query||[s.name,s.description,...s.tags].join(' ').toLowerCase().includes(state.query.toLowerCase());
     function card(s){return `<article class="card" data-id="${s.id}"><a class="card-link" href="${s.url}" target="_blank" rel="noopener noreferrer" aria-label="打开 ${esc(s.name)}（新窗口）"><span class="name">${esc(s.name)}</span><span class="desc">${esc(s.description)}</span><span class="tags">${s.tags.slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</span></a></article>`}
-    function renderNav(){const all=[{id:'all',icon:'◈',name:'全部',count:services.length},...categories.map(c=>({...c,count:services.filter(s=>s.category===c.id).length}))];$('#categoryNav').innerHTML=all.map(c=>`<button type="button" data-category="${c.id}" aria-pressed="${state.category===c.id}"><span>${c.icon} ${c.name}</span><small>${c.count}</small></button>`).join('')}
+    function renderNav(){const all=[{id:'all',icon:'🗂️',name:'全部',count:services.length},...categories.map(c=>({...c,count:services.filter(s=>s.category===c.id).length}))];$('#categoryNav').innerHTML=all.map(c=>`<button type="button" data-category="${c.id}" aria-pressed="${state.category===c.id}"><span>${c.icon} ${c.name}</span><small>${c.count}</small></button>`).join('')}
     function renderRecent(){const items=state.recent.map(id=>byId.get(id)).filter(Boolean);$('#recentBox').hidden=!items.length;$('#recent').innerHTML=items.map(s=>card(s)).join('')}
     function render(){renderNav();renderRecent();let count=0;$('#sections').innerHTML=categories.map(c=>{const items=services.filter(s=>s.category===c.id&&match(s)),selected=state.category==='all'||state.category===c.id;if(selected)count+=items.length;return `<section class="section" id="category-${c.id}" ${!selected||!items.length?'hidden':''}><div class="head"><h2>${c.icon} ${c.name}</h2><p>${c.description} · ${items.length} 项</p></div><div class="grid">${items.map(s=>card(s)).join('')}</div></section>`}).join('');const filtered=state.query||state.category!=='all';$('#summary').textContent=filtered?`找到 ${count} 项服务${state.query?`，匹配“${state.query}”`:''}`:'';$('#empty').classList.toggle('show',count===0)}
     $('#categoryNav').addEventListener('click',e=>{const b=e.target.closest('[data-category]');if(!b)return;state.category=b.dataset.category;render();$(state.category==='all'?'#main':`#category-${state.category}`)?.scrollIntoView({behavior:'smooth',block:'start'})});
@@ -45,7 +45,7 @@
       },
       {
         "id": "ai",
-        "icon": "🤖",
+        "icon": "✨",
         "name": "AI",
         "description": "对话、研究与生成式创作"
       },
@@ -57,19 +57,19 @@
       },
       {
         "id": "development",
-        "icon": "⌨️",
+        "icon": "🧩",
         "name": "开发",
         "description": "代码托管、云计算与网络"
       },
       {
         "id": "media",
-        "icon": "▶️",
+        "icon": "👥",
         "name": "社区",
         "description": "影音娱乐、社交与内容发布"
       },
       {
         "id": "life",
-        "icon": "🧭",
+        "icon": "🗺️",
         "name": "生活",
         "description": "地图、出行与存储"
       }
